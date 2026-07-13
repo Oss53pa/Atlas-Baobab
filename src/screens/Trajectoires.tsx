@@ -4,7 +4,7 @@ import { Sparkles, ChevronRight, X, Heart, MessageSquare, Plus, Wind } from 'luc
 import { activeChild, actions, useAppState } from '../lib/store.js';
 import {
   domainTrends, acquiredList, emergingList, acquisitionFiche, caaTrajectory,
-  learningProfile, AXIS_BADGE_LABEL, calmTrajectory,
+  learningProfile, AXIS_BADGE_LABEL, calmTrajectory, plateaus,
   lifeEventsFor, lifeEventType, LIFE_EVENT_TYPES,
   STATE_LABEL, STATE_TINT, type CompStatus,
 } from '../lib/trajectoires.js';
@@ -26,6 +26,7 @@ export function Trajectoires({ go }: { go: (v: View) => void }) {
   const axes = useMemo(() => (child ? learningProfile(child.id, state) : []), [child, state]);
   const events = useMemo(() => (child ? lifeEventsFor(child.id, state) : []), [child, state]);
   const calm = useMemo(() => (child ? calmTrajectory(child.id, state) : null), [child, state]);
+  const stuck = useMemo(() => (child ? plateaus(child.id, state) : []), [child, state]);
 
   if (!child) return null;
 
@@ -88,6 +89,26 @@ export function Trajectoires({ go }: { go: (v: View) => void }) {
                 <span className="tr-chip" key={s.activity.id} style={{ '--c': STATE_TINT[s.state] } as React.CSSProperties}>{s.activity.label} <small>{STATE_LABEL[s.state].toLowerCase()}</small></span>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Ce qui plafonne · pivots (§7.4) */}
+        {stuck.length > 0 && (
+          <div className="card tr-stuck">
+            <h3 style={{ fontSize: 17 }}>Ce qui semble marquer une pause</h3>
+            <p className="muted" style={{ fontSize: 13, lineHeight: 1.5 }}>Une compétence qui n’avance plus depuis quelques séances, ce n’est pas un échec — souvent, ça vient d’abord en vrai. CORTEX change de chemin en douceur, sans que {child.first_name} le voie.</p>
+            {stuck.map((p) => (
+              <div className="tr-stuck-row" key={p.status.activity.id}>
+                <div style={{ minWidth: 0 }}>
+                  <b>{p.status.activity.label}</b>
+                  <div className="muted" style={{ fontSize: 12.5 }}>{p.sessions} séances sans nouveau progrès à l’écran</div>
+                </div>
+                {p.mirror && (
+                  <button className="btn" onClick={() => go('ensemble')}>Le tenter en vrai : « {p.mirror} »</button>
+                )}
+              </div>
+            ))}
+            <p className="notice" style={{ marginTop: 8 }}>« À l’écran, ça ne passe pas encore. Parfois ça vient d’abord en vrai. » — une piste, jamais un reproche.</p>
           </div>
         )}
 

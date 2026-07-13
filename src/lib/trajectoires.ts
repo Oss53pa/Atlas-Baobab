@@ -187,6 +187,27 @@ export function caaTrajectory(childId: string, state: AppState, nowMs = Date.now
   return { vocabNow: distinct.size, vocabBefore: before.size, categories, premieres, totalPresses: presses.length };
 }
 
+// ── Détection des plateaux (CX-01 §7.4) ──────────────────────────────────────
+// Affiner les méthodes, c'est surtout savoir QUAND en changer. Une compétence
+// émergente qui ne progresse plus depuis plusieurs séances = un plateau — SAUF
+// pendant une fenêtre d'événement de vie (§5) où c'est le contexte qui explique.
+export interface Plateau { status: CompStatus; sessions: number; mirror: string | null; }
+export function plateaus(childId: string, state: AppState): Plateau[] {
+  const out: Plateau[] = [];
+  for (const s of emergingList(childId, state)) {
+    if (s.logs.length < 4) continue;
+    const win = s.logs.slice(-4);
+    const startLevel = win[0].level;
+    const noProgress = Math.max(...win.map((l) => l.level)) <= startLevel; // aucune montée sur la fenêtre
+    if (!noProgress) continue;
+    // Hors fenêtre d'événement majeur : là, c'est le contexte, pas un plateau.
+    if (nearMajorEvent(childId, state, Date.parse(win[win.length - 1].occurred_at))) continue;
+    const mirror = FICHES.find((f) => f.domains.includes(s.activity.domain as ActivityDomainKey))?.title ?? null;
+    out.push({ status: s, sessions: win.length, mirror });
+  }
+  return out;
+}
+
 // ── Trajectoire de régulation « Son calme » (CX-01 §4.3) ─────────────────────
 export interface CalmTrajectory {
   hardBefore: number;

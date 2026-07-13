@@ -1628,6 +1628,12 @@ label.lbl { font-size: 13px; font-weight: 600; color: var(--text-muted); display
 .tr-next { margin-top: 14px; padding: 14px 15px; border-radius: 14px; background: color-mix(in srgb, var(--accent) 9%, var(--surface)); border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border)); }
 .tr-next b { font-size: 14px; }
 .tr-next p { font-size: 14px; line-height: 1.5; margin-top: 4px; }
+/* Ce qui plafonne · pivots (§7.4) */
+.tr-stuck { border-left: 4px solid var(--accent); }
+.tr-stuck-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 11px 0; border-top: 1px solid var(--border); }
+.tr-stuck-row:first-of-type { border-top: none; margin-top: 6px; }
+.tr-stuck-row b { font-size: 14px; }
+
 /* Chronologie de vie */
 .tr-evpick { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 .tr-evbtn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; padding: 8px 13px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--text); }

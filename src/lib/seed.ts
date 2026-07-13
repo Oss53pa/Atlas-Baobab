@@ -150,6 +150,7 @@ export function seedActivityLogs(childId: string, deviceId = 'seed', now = new D
   const plan: [string, string, [number, number][]][] = [
     ['com-choice', 'communication', [[18, 2], [10, 3], [3, 4]]],
     ['com-name', 'communication', [[16, 2], [6, 3]]],
+    ['com-ask', 'communication', [[20, 2], [13, 2], [7, 2], [2, 2]]], // plafonne : 4 séances, niveau 2 stable (CX-01 §7.4)
     ['aut-eat', 'autonomie', [[19, 2], [9, 3], [2, 4]]],
     ['aut-wash', 'autonomie', [[12, 1], [4, 2]]],
     ['mot-stack', 'motricite', [[15, 3], [5, 4]]],
