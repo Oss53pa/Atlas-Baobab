@@ -8,6 +8,7 @@ import {
   type Fiche,
 } from '../lib/togetherPlay.js';
 import { DOMAINS, domainOf, type ActivityDomainKey } from '../lib/activities.js';
+import { profileTip } from '../lib/trajectoires.js';
 import { speak } from '../lib/tts.js';
 import { Tabs } from '../components/Tabs.js';
 
@@ -30,6 +31,7 @@ export function OnJoueEnsemble() {
     () => (child ? suggestedFiches(child.id, state) : []),
     [child, state],
   );
+  const tip = useMemo(() => (child ? profileTip(child.id, state) : null), [child, state]);
 
   const doneMap = useMemo(() => {
     const m = new Map<string, { count: number; last: string }>();
@@ -65,7 +67,9 @@ export function OnJoueEnsemble() {
       <Tabs tabs={[{ key: 'semaine', label: 'Cette semaine' }, { key: 'catalogue', label: 'Tout le catalogue' }]} active={tab} onChange={setTab} />
 
       {/* Suggestions de la semaine (§4.4) — jamais impératif */}
-      {tab === 'semaine' && (suggestions.length > 0 ? (
+      {tab === 'semaine' && (<>
+        {tip && <p className="oje-why"><Sparkles size={14} /> {tip} <small>· pourquoi ces idées</small></p>}
+        {suggestions.length > 0 ? (
         <section className="oje-sugg">
           <div className="oje-sugg-cap"><Sparkles size={14} /> Cette semaine, si vous avez un moment</div>
           <div className="oje-sugg-row">
@@ -78,9 +82,10 @@ export function OnJoueEnsemble() {
             ))}
           </div>
         </section>
-      ) : (
+        ) : (
         <p className="muted" style={{ textAlign: 'center', padding: 30 }}>Rien de suggéré cette semaine — parcourez tout le catalogue dans l’onglet à côté.</p>
-      ))}
+        )}
+      </>)}
 
       {tab === 'catalogue' && <>
       {/* Filtres */}

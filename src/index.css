@@ -1873,6 +1873,12 @@ label.lbl { font-size: 13px; font-weight: 600; color: var(--text-muted); display
   background: var(--surface-2, var(--tile)); border: 1px solid var(--border); border-radius: 12px; padding: 9px 11px; }
 .oje-disclaimer svg { flex: 0 0 auto; margin-top: 1px; opacity: .75; }
 
+/* Boucle d'affinage (§7.3) : le « pourquoi » des suggestions */
+.oje-why { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; line-height: 1.45; color: color-mix(in srgb, var(--accent) 72%, var(--text));
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface)); border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border)); border-radius: 14px; padding: 11px 14px; }
+.oje-why svg { flex: 0 0 auto; color: var(--accent); }
+.oje-why small { color: var(--text-muted); font-weight: 600; }
+
 /* Suggestions de la semaine */
 .oje-sugg { background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 12%, var(--surface)), var(--surface));
   border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border)); border-radius: var(--radius); padding: 14px; }

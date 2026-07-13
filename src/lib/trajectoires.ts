@@ -268,4 +268,19 @@ export function learningProfile(childId: string, state: AppState): Axis[] {
   ];
 }
 
+/** Boucle d'affinage (§7.3) : le profil informe ce que CORTEX propose, et le parent
+ * voit POURQUOI. Un « pourquoi » d'une ligne, tiré des tendances réelles — jamais
+ * une injonction. `null` s'il n'y a pas encore de signal. */
+export function profileTip(childId: string, state: AppState): string | null {
+  const ax = learningProfile(childId, state);
+  const moment = ax.find((a) => a.key === 'moment' && a.finding);
+  if (moment) {
+    const when = moment.finding!.includes('matin') ? 'le matin' : moment.finding!.includes('après-midi') ? 'l’après-midi' : 'le soir';
+    return `En ce moment, ${when} lui réussit bien — un beau créneau pour ces idées.`;
+  }
+  const format = ax.find((a) => a.key === 'format' && a.finding);
+  if (format) return format.finding!.includes('courtes') ? 'Des moments courts et fréquents lui vont bien ces temps-ci.' : 'Il tient sur des moments plus longs, en ce moment.';
+  return null;
+}
+
 export { relativeDay };
