@@ -1,0 +1,70 @@
+/* Atlas Baobab — tokens de design (CDC §9).
+ * Règle absolue : AUCUN fond sombre, nulle part. Tous fonds clairs.
+ * Le thème parent est la racine ; les thèmes enfant s'appliquent via
+ * [data-theme="..."] sur le conteneur de l'instrument enfant. */
+
+:root {
+  /* App Parent — identité "Atlas Baobab" claire (§9.1) */
+  --bg: #f5f2ec;
+  --surface: #ffffff;
+  --surface-2: #faf7f1;
+  --border: #e7e0d4;
+  --primary: #7a9e7e;
+  --primary-ink: #fdfcfa;
+  --accent: #d99c3f; /* ambre désaturé UI (le #EF9F27 est réservé au logo) */
+  --accent-ink: #4a3a26;
+  --text: #4a453e;
+  --text-muted: #8a8378;
+
+  /* Sémantique Radar (§9.1) — jamais de rouge vif */
+  --radar-green: #7a9e7e;
+  --radar-orange: #d9a66c;
+  --radar-red: #c46a5a; /* terracotta */
+
+  --tile: #f1ebdf;
+
+  /* Typographies (§9) */
+  --font-brand: 'Grand Hotel', cursive;
+  --font-ui: 'Dosis', system-ui, sans-serif;
+  --font-child: 'Nunito', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --radius: 18px;
+  --radius-lg: 24px;
+  --shadow: 0 2px 4px rgba(74, 69, 62, 0.05), 0 14px 30px -10px rgba(74, 69, 62, 0.14);
+  --shadow-lg: 0 24px 54px -16px rgba(74, 69, 62, 0.22);
+  --ease: cubic-bezier(0.22, 0.75, 0.28, 1);
+}
+
+/* ── 5 thèmes enfant clairs (§9.2) ─────────────────────────────────────── */
+
+[data-theme='savane'] {
+  --bg: #f7f3ec; --surface: #fdfcfa; --border: #e4ded2;
+  --primary: #7a9e7e; --primary-ink: #fdfcfa;
+  --secondary: #d9a66c; --accent: #8fb98b; --accent-ink: #2f4230;
+  --text: #4a453e; --text-muted: #8a8378; --tile: #f1ebdf;
+}
+[data-theme='lagune'] {
+  --bg: #eef4f5; --surface: #fbfdfd; --border: #d8e3e5;
+  --primary: #6e9fb3; --primary-ink: #f6fafb;
+  --secondary: #a3c9bc; --accent: #e3c9a0; --accent-ink: #4a3e28;
+  --text: #42505a; --text-muted: #7c8890; --tile: #e2ecee;
+}
+[data-theme='coton'] {
+  --bg: #f4f2f5; --surface: #fcfbfd; --border: #e2dde6;
+  --primary: #9b8fb0; --primary-ink: #f8f6fa;
+  --secondary: #b8afa3; --accent: #a9bfa4; --accent-ink: #31402e;
+  --text: #4c4652; --text-muted: #8b8592; --tile: #ece8ef;
+}
+[data-theme='terre'] {
+  --bg: #f9f1ec; --surface: #fdfaf8; --border: #ebddd4;
+  --primary: #c98a74; --primary-ink: #fbf4f1;
+  --secondary: #e5c3b3; --accent: #a8b5a0; --accent-ink: #333e2e;
+  --text: #54453d; --text-muted: #948379; --tile: #f3e6de;
+}
+[data-theme='brume'] {
+  --bg: #f1f5ee; --surface: #fbfcfa; --border: #dee7da;
+  --primary: #84a98c; --primary-ink: #f4f8f4;
+  --secondary: #b5c9a8; --accent: #decfa9; --accent-ink: #4c4227;
+  --text: #454f44; --text-muted: #7f8a7e; --tile: #e7eee2;
+}

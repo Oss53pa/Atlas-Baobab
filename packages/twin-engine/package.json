@@ -1,0 +1,22 @@
+{
+  "name": "@atlas-baobab/twin-engine",
+  "version": "0.1.0",
+  "description": "Moteur Jumeau deterministe et versionne (Atlas Baobab). Aucun LLM ne calcule ici : profil sensoriel, declencheurs, score de tension Radar.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^2.1.8",
+    "typescript": "^5.5.3",
+    "vitest": "^2.1.8"
+  }
+}
