@@ -1,13 +1,15 @@
 import { useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Sparkles, ChevronRight, X, Heart, MessageSquare, Plus, Wind } from 'lucide-react';
+import { Sparkles, ChevronRight, X, Heart, MessageSquare, Plus, Wind, FileDown, Check } from 'lucide-react';
 import { activeChild, actions, useAppState } from '../lib/store.js';
 import {
   domainTrends, acquiredList, emergingList, acquisitionFiche, caaTrajectory,
   learningProfile, AXIS_BADGE_LABEL, calmTrajectory, plateaus,
   lifeEventsFor, lifeEventType, LIFE_EVENT_TYPES,
+  buildProReport, PRO_SECTIONS,
   STATE_LABEL, STATE_TINT, type CompStatus,
 } from '../lib/trajectoires.js';
+import { printReport } from '../lib/rapports.js';
 import { formatDate, relativeDay } from '../lib/format.js';
 import { Tabs } from '../components/Tabs.js';
 import type { View } from '../App.js';
@@ -18,6 +20,8 @@ export function Trajectoires({ go }: { go: (v: View) => void }) {
   const [tab, setTab] = useState<'ap' | 'voix' | 'profil'>('ap');
   const [open, setOpen] = useState<CompStatus | null>(null);
   const [addingEvent, setAddingEvent] = useState(false);
+  const [proOpen, setProOpen] = useState(false);
+  const [proSec, setProSec] = useState<Set<string>>(() => new Set(PRO_SECTIONS.filter((s) => s.def).map((s) => s.key)));
 
   const trends = useMemo(() => (child ? domainTrends(child.id, state) : []), [child, state]);
   const acquired = useMemo(() => (child ? acquiredList(child.id, state) : []), [child, state]);
@@ -34,7 +38,10 @@ export function Trajectoires({ go }: { go: (v: View) => void }) {
     <div className="reveal tr-wrap">
       <div className="co-head">
         <p className="muted" style={{ fontSize: 14 }}>Ce que {child.first_name} a appris, et <b style={{ color: 'var(--text)' }}>comment</b> il l’a appris. Sa seule référence, c’est lui-même hier.</p>
-        <span className="pill-soft">{acquired.length} acquis</span>
+        <div className="row" style={{ gap: 8, alignItems: 'center' }}>
+          <span className="pill-soft">{acquired.length} acquis</span>
+          <button className="btn" onClick={() => setProOpen(true)}><FileDown size={15} /> Rapport pro</button>
+        </div>
       </div>
 
       <Tabs tabs={[{ key: 'ap', label: 'Avant / Après' }, { key: 'voix', label: 'Voix & calme' }, { key: 'profil', label: 'Comment il apprend' }]} active={tab} onChange={setTab} />
@@ -228,6 +235,31 @@ export function Trajectoires({ go }: { go: (v: View) => void }) {
             ))}
           </div>
           <p className="notice" style={{ marginTop: 12 }}>Ces repères affinent en silence ce que CORTEX propose (les jeux de la natte, les fiches) — jamais rien ne change pour {child.first_name} de son côté.</p>
+        </div>
+      )}
+
+      {proOpen && (
+        <div className="modal-scrim" onClick={() => setProOpen(false)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="row between" style={{ marginBottom: 6 }}>
+              <h3 style={{ fontSize: 18 }}>Rapport pour un professionnel</h3>
+              <button className="oje-m-close" onClick={() => setProOpen(false)} aria-label="Fermer"><X size={18} /></button>
+            </div>
+            <p className="muted" style={{ fontSize: 13, lineHeight: 1.5 }}>Vous choisissez ce que vous partagez — décoché = absent du document. Rien ne part automatiquement.</p>
+            <div className="rp2-consent" style={{ marginTop: 12 }}>
+              {PRO_SECTIONS.map((s) => (
+                <button key={s.key} className="rp2-crow" onClick={() => setProSec((p) => { const n = new Set(p); n.has(s.key) ? n.delete(s.key) : n.add(s.key); return n; })}>
+                  <span className={`rp2-cb ${proSec.has(s.key) ? 'on' : ''}`}>{proSec.has(s.key) && <Check size={15} />}</span>
+                  <span><b>{s.label}</b></span>
+                </button>
+              ))}
+            </div>
+            <button className="btn btn-accent btn-block btn-lg" style={{ marginTop: 14 }}
+              onClick={() => { printReport('Trajectoire · ' + child.first_name, buildProReport(child.id, child.first_name, state, [...proSec])); setProOpen(false); }}>
+              <FileDown size={17} /> Générer le rapport (PDF)
+            </button>
+            <p className="notice" style={{ marginTop: 10 }}>Mention sur chaque page : « Observations d’usage. Ne constitue ni un bilan ni un diagnostic. »</p>
+          </div>
         </div>
       )}
 

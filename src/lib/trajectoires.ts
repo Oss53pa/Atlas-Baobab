@@ -304,4 +304,49 @@ export function profileTip(childId: string, state: AppState): string | null {
   return null;
 }
 
+// ── Vue professionnelle · rapport exportable (CX-01 §6) ──────────────────────
+// Le parent choisit SECTION PAR SECTION ce qu'il partage ; rien ne part
+// automatiquement. Formulé en constat, mention non-diagnostic sur le document.
+export interface ProSection { key: string; label: string; def: boolean; }
+export const PRO_SECTIONS: ProSection[] = [
+  { key: 'competences', label: 'Compétences par état (avec dates)', def: true },
+  { key: 'voix', label: 'Sa voix (CAA) : vocabulaire, premières', def: true },
+  { key: 'calme', label: 'Son calme (régulation)', def: true },
+  { key: 'profil', label: 'Profil d’apprentissage (tendances)', def: true },
+  { key: 'chronologie', label: 'Chronologie de vie', def: false },
+];
+function esc(s: string): string { return s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!)); }
+
+export function buildProReport(childId: string, childName: string, state: AppState, sections: string[]): string {
+  const has = (k: string) => sections.includes(k);
+  const p: string[] = [];
+  p.push(`<header><h1>Trajectoire d’observation · ${esc(childName)}</h1><p class="meta">Observations d’usage — synthèse de la période récente</p></header>`);
+
+  if (has('competences')) {
+    const rows = allStatuses(childId, state).filter((s) => s.state !== 'non_observee')
+      .sort((a, b) => STATE_ORDER.indexOf(b.state) - STATE_ORDER.indexOf(a.state))
+      .map((s) => `<tr><td>${esc(s.activity.label)}</td><td>${STATE_LABEL[s.state]}</td><td>${s.acquiredAt ? `acquise le ${formatDate(s.acquiredAt)}` : s.emergedAt ? `depuis le ${formatDate(s.emergedAt)}` : '—'}</td></tr>`).join('');
+    p.push(`<section><h2>Compétences par état</h2><table><thead><tr><th>Compétence</th><th>État</th><th>Repère</th></tr></thead><tbody>${rows}</tbody></table><p class="soft">Décrit ${esc(childName)} par rapport à lui-même, jamais à d’autres enfants.</p></section>`);
+  }
+  if (has('voix')) {
+    const c = caaTrajectory(childId, state);
+    const prem = c.premieres.map((x) => `<li>« ${esc(x.label)} » — première fois le ${formatDate(x.at)}</li>`).join('');
+    p.push(`<section><h2>Sa voix (communication CAA)</h2><p>Vocabulaire actif : ${c.vocabBefore} → <b>${c.vocabNow}</b> cartes distinctes. Univers ouverts : ${esc(c.categories.map((x) => x.label).join(', ') || '—')}.</p><p>Premières historiques :</p><ul>${prem || '<li>—</li>'}</ul></section>`);
+  }
+  if (has('calme')) {
+    const cal = calmTrajectory(childId, state);
+    p.push(`<section><h2>Son calme (régulation)</h2><p>Moments difficiles : ${cal.hardNow} sur 14 jours (contre ${cal.hardBefore} sur la période précédente). Ce qui l’apaise : ${esc(cal.calms.map((x) => x.label).join(', ') || '—')}.</p></section>`);
+  }
+  if (has('profil')) {
+    const ax = learningProfile(childId, state).filter((a) => a.finding);
+    p.push(`<section><h2>Profil d’apprentissage (tendances)</h2><ul>${ax.map((a) => `<li>${esc(a.label)} : ${esc(a.finding!)} <em>(${AXIS_BADGE_LABEL[a.badge].toLowerCase()})</em></li>`).join('') || '<li>Pas encore de tendance nette.</li>'}</ul></section>`);
+  }
+  if (has('chronologie')) {
+    const evs = lifeEventsFor(childId, state);
+    p.push(`<section><h2>Chronologie de vie</h2><ul>${evs.map((e) => `<li>${esc(lifeEventType(e.kind).label)} — ${formatDate(e.at)}</li>`).join('') || '<li>—</li>'}</ul></section>`);
+  }
+  p.push('<footer>Observations d’usage issues de l’application. Ne constitue ni un bilan ni un diagnostic.</footer>');
+  return p.join('\n');
+}
+
 export { relativeDay };
