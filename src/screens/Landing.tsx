@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { AVATARS, avatarGlyph } from '../lib/avatars.js';
 import { KIND_GLYPH, KIND_TINT } from '../components/glyphs.js';
+import { ArtImage } from '../components/ArtImage.js';
 import type { CSSProperties } from 'react';
 
 /** Apparition des cartes au défilement + parallaxe léger du visuel héro.
@@ -111,6 +112,7 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
               </blockquote>
               <cite>De maman à maman, l’équipe Atlas Baobab</cite>
             </div>
+            <ArtImage name="fondatrice.png" alt="Une maman et son enfant, front contre front" ratio="1 / 1" className="founder-art" />
           </div>
         </div>
       </div>
@@ -218,6 +220,7 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
               <span className="force-tag">💗 La tendresse</span>
               <span className="force-tag">🚗 Les passions intenses</span>
             </div>
+            <ArtImage name="celebrer.png" alt="Un enfant fier montre son dessin, son parent applaudit" ratio="4 / 3" className="art-band" />
           </div>
         </div>
       </section>
@@ -295,7 +298,8 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
       <section className="lp-section">
         <div className="lp-wrap">
           <div className="final-cta">
-            <div className="eyebrow" style={{ justifyContent: 'center' }}><i className="dot" /> 🌿 Le premier pas</div>
+            <ArtImage name="cta-baobab.png" alt="Un parent et son enfant marchent main dans la main vers un baobab au coucher du soleil" ratio="16 / 9" className="art-band" />
+            <div className="eyebrow" style={{ justifyContent: 'center', marginTop: 24 }}><i className="dot" /> 🌿 Le premier pas</div>
             <h2 className="lp-h2" style={{ margin: '12px auto 0' }}>Il est gratuit. Et il change déjà quelque chose.</h2>
             <p className="lp-lead2" style={{ margin: '12px auto 0' }}>Quelques secondes, sans compte, sans engagement. Juste pour souffler un peu.</p>
             <div className="lp-cta-row" style={{ justifyContent: 'center' }}>
