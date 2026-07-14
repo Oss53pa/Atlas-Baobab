@@ -824,7 +824,11 @@ input.field::placeholder, textarea.field::placeholder { color: color-mix(in srgb
   background: var(--surface); border: 2px solid color-mix(in srgb, var(--accent) 45%, var(--border)); border-radius: 24px; padding: 18px 26px;
   box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 14%, transparent), var(--shadow-lg); animation: arbre-med 3.2s ease forwards; z-index: 5; }
 @keyframes arbre-med { 0% { opacity: 0; transform: translate(-50%, -46%) scale(.9); } 12%, 80% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; } }
+.arbre-med-star { width: 56px; height: 56px; object-fit: contain; filter: drop-shadow(0 6px 12px rgba(217,156,63,.35)); animation: cs-pop .5s var(--ease) both; }
+.arbre-wrap.static .arbre-med-star { animation: none; }
+@keyframes cs-pop { from { transform: scale(.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .arbre-med-e { font-size: 46px; line-height: 1; }
+.cs-zi-img { width: 1.7em; height: 1.7em; object-fit: contain; vertical-align: middle; }
 .arbre-med-t { font-size: 18px; font-weight: 800; color: var(--text); text-align: center; max-width: 240px; line-height: 1.2; }
 .arbre-home { position: absolute; top: 18px; left: 18px; z-index: 6; width: 56px; height: 56px; border-radius: 18px; display: grid; place-items: center;
   color: var(--text); background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); }

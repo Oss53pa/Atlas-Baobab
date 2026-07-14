@@ -8,7 +8,7 @@
  * malheureux de ne pas le voir.
  */
 
-export type AvatarKey = 'pousse' | 'luciole' | 'cameleon' | 'tisserin' | 'tortue';
+export type AvatarKey = 'pousse' | 'luciole' | 'cameleon' | 'tisserin' | 'tortue' | 'cactus';
 export type AvatarMotion = 'slow' | 'minimal' | 'static';
 
 export interface AvatarDef {
@@ -26,6 +26,7 @@ export const AVATARS: readonly AvatarDef[] = [
   { key: 'cameleon', label: 'Le Caméléon', symbol: "Celui qui s'adapte", suggestedName: 'Kama', glyphs: ['🦎'] },
   { key: 'tisserin', label: "L'Oiseau tisserin", symbol: 'Celui qui construit patiemment', suggestedName: 'Titi', glyphs: ['🐦'] },
   { key: 'tortue', label: 'La Tortue', symbol: 'Chacun son rythme', suggestedName: 'Momo', glyphs: ['🐢'] },
+  { key: 'cactus', label: 'Le Cactus', symbol: 'Il fleurit à son heure', suggestedName: 'Piko', glyphs: ['🌵'] },
 ] as const;
 
 export function avatarDef(key: AvatarKey): AvatarDef {
@@ -40,6 +41,7 @@ export function avatarDef(key: AvatarKey): AvatarDef {
 export const AVATAR_IMG: Partial<Record<AvatarKey, string>> = {
   tisserin: '/avatars/titi.webp',
   tortue: '/avatars/momo.webp',
+  cactus: '/avatars/cactus.webp',
 };
 
 /** Chemin de l'illustration d'un avatar, ou null si seul l'emoji est dispo. */

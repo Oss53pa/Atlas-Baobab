@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Home } from 'lucide-react';
 import { activeChild, useAppState } from '../../lib/store.js';
-import { avatarGlyph } from '../../lib/avatars.js';
+import { avatarGlyph, ART } from '../../lib/avatars.js';
 import { acquiredList } from '../../lib/trajectoires.js';
 import { speak } from '../../lib/tts.js';
 
@@ -111,6 +111,7 @@ export function MonArbre({ onExit }: { onExit: () => void }) {
 
       {medallion && (
         <div className="arbre-medallion" aria-live="polite">
+          <img className="arbre-med-star" src={ART.etoile} alt="" aria-hidden />
           <span className="arbre-med-e">{medallion.emoji}</span>
           <span className="arbre-med-t">{medallion.label}</span>
         </div>

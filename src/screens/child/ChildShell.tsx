@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Key } from 'lucide-react';
 import { activeChild, acquiredCompetences, growthPoints, useAppState } from '../../lib/store.js';
-import { avatarGlyph, computeGrowthStage } from '../../lib/avatars.js';
+import { avatarGlyph, computeGrowthStage, ART } from '../../lib/avatars.js';
 import { childRegistre, registreCopy } from '../../lib/paliers.js';
 import { speak } from '../../lib/tts.js';
 import { Caa } from './Caa.js';
@@ -229,7 +229,7 @@ export function ChildShell({ onExit, start = 'home' }: { onExit: () => void; sta
 
       {/* Zones tactiles géantes */}
       <button className="cs-zone" style={{ left: '3%', top: '17%', width: '35%', height: '50%' }} onClick={() => tapZone('arbre', 'Mon arbre', () => setView('arbre'))}>
-        <span className="cs-zlabel" style={{ bottom: '8%' }}><span className="cs-zi">🌳</span><span>Mon arbre</span><span className="cs-zc">›</span></span>
+        <span className="cs-zlabel" style={{ bottom: '8%' }}><img className="cs-zi-img" src={ART.arbre} alt="" aria-hidden /><span>Mon arbre</span><span className="cs-zc">›</span></span>
       </button>
       <button className={`cs-zone ${overQuota ? 'muted' : ''}`} style={{ left: '62%', top: '42%', width: '35%', height: '34%' }}
         onClick={() => overQuota ? speak(rc.quotaSpeak) : tapZone('jouer', 'Jouer', () => setView('game'))}>

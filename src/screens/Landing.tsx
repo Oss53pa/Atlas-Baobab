@@ -161,7 +161,7 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
           <div className="compagnons">
             {AVATARS.map((a, i) => (
               <div className="compagnon" key={a.key}>
-                <div className={i % 2 ? 'face floaty-2' : 'face floaty'} style={{ background: ['#f1ebdf', '#e2ecee', '#ece8ef', '#f3e6de', '#e7eee2'][i] }}>
+                <div className={i % 2 ? 'face floaty-2' : 'face floaty'} style={{ background: ['#f1ebdf', '#e2ecee', '#ece8ef', '#f3e6de', '#e7eee2', '#eaf1e6'][i] }}>
                   <AvatarPic akey={a.key} stage={4} />
                 </div>
                 <small>{a.suggestedName}</small>
