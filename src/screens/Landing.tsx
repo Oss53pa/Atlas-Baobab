@@ -179,6 +179,7 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
           <ArtImage name="parole.webp" alt="Un papa à hauteur de son enfant qui désigne un tableau d’images" ratio="4 / 3" className="art-band" />
 
           <Feature
+            art="cortex.webp"
             glyph="🧠" sparks={['💡', '🌙']} bg="linear-gradient(150deg,#f7f3ec,#e8f0e9)"
             chip="CORTEX, le moteur"
             title="Une petite intelligence qui apprend votre enfant par cœur"
@@ -186,6 +187,7 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
             bullets={['« Les crises arrivent souvent en fin de journée »', 'Les stratégies qui marchent remontent en premier', 'Des calculs fiables, jamais laissés au hasard de l’IA']}
           />
           <Feature
+            art="caa.webp"
             glyph="💬" sparks={['🍚', '🤗']} bg="linear-gradient(150deg,#eef4f5,#e2ecee)" rev
             chip="La CAA, sa voix"
             title="Rendez la parole à votre enfant"
@@ -193,6 +195,7 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
             bullets={['Des images claires + vos propres photos', 'Voix immédiate, moins de 0,3 seconde', 'Jamais coupée : c’est sa voix, on n’y touche pas']}
           />
           <Feature
+            art="coach.webp"
             glyph="🎓" sparks={['📖', '⭐']} bg="linear-gradient(150deg,#f4f2f5,#ece8ef)"
             chip="Le Coach"
             title="Vous n’êtes plus seuls, on vous forme, pas à pas"
@@ -200,6 +203,7 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
             bullets={['« Il refuse de se brosser les dents, je fais quoi ? »', 'Histoires sociales à imprimer', 'Zéro jargon, que du concret']}
           />
           <Feature
+            art="communaute.webp"
             glyph="🤝" sparks={['💛', '🌍']} bg="linear-gradient(150deg,#f9f1ec,#f3e6de)" rev
             chip="La communauté"
             title="Un cercle de parents qui comprennent vraiment"
@@ -385,7 +389,7 @@ function Step({ title, text }: { title: string; text: string }) {
   return <div className="step"><span className="n" /><div><h4>{title}</h4><p>{text}</p></div></div>;
 }
 
-function Feature({ glyph, sparks, bg, chip, title, text, bullets, rev }: { glyph: string; sparks: string[]; bg: string; chip: string; title: string; text: string; bullets: string[]; rev?: boolean }) {
+function Feature({ glyph, sparks, bg, chip, title, text, bullets, rev, art }: { glyph: string; sparks: string[]; bg: string; chip: string; title: string; text: string; bullets: string[]; rev?: boolean; art?: string }) {
   return (
     <div className={rev ? 'feat rev' : 'feat'}>
       <div className="feat-copy">
@@ -395,9 +399,15 @@ function Feature({ glyph, sparks, bg, chip, title, text, bullets, rev }: { glyph
         <ul>{bullets.map((b) => <li key={b}>{b}</li>)}</ul>
       </div>
       <div className="feat-visual" style={{ background: bg }}>
-        <span className="spark floaty-2" style={{ top: 20, left: 26 }}>{sparks[0]}</span>
-        <span className="glyph floaty">{glyph}</span>
-        <span className="spark floaty-2" style={{ bottom: 22, right: 28 }}>{sparks[1]}</span>
+        {art ? (
+          <img className="feat-art" src={`/art/features/${art}`} alt="" loading="lazy" decoding="async" />
+        ) : (
+          <>
+            <span className="spark floaty-2" style={{ top: 20, left: 26 }}>{sparks[0]}</span>
+            <span className="glyph floaty">{glyph}</span>
+            <span className="spark floaty-2" style={{ bottom: 22, right: 28 }}>{sparks[1]}</span>
+          </>
+        )}
       </div>
     </div>
   );
