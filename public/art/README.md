@@ -1,18 +1,19 @@
 # Illustrations de la landing
 
-Déposez ici les PNG générés (cf. `docs/illustrations-prompts.md`). Noms exacts
-attendus par le composant `ArtImage` :
+Illustrations générées (ChatGPT/DALL·E, cf. `docs/illustrations-prompts.md`),
+converties en **WebP** (qualité 82) pour rester légères hors ligne. Fichiers
+servis par le composant `ArtImage` :
 
-| Fichier | Section | Ratio |
+| Fichier | Section | Ratio réel |
 |---|---|---|
-| `hero-famille.png` | Héros | 4:5 |
-| `fondatrice.png` | Note fondatrice | 1:1 |
-| `comprendre.png` | Comprendre | 4:3 |
-| `parole.png` | La parole (CAA) | 4:3 |
-| `apaiser.png` | Apaiser | 1:1 |
-| `celebrer.png` | Célébration des forces | 4:3 |
-| `cta-baobab.png` | CTA final | 16:9 |
+| `hero-famille.webp` | La boucle | 5:4 |
+| `fondatrice.webp` | Note fondatrice | 4:5 |
+| `comprendre.webp` | On connaît ce chemin | 4:3 |
+| `parole.webp` | Les outils (CAA) | 4:3 |
+| `apaiser.webp` | Manifeste | 1:1 |
+| `celebrer.webp` | Célébration des forces | 5:4 |
+| `cta-baobab.webp` | CTA final | 3:2 |
 
-PNG, ~1600 px sur le grand côté (héros jusqu'à 2000 px). Tant qu'un fichier
-manque, un cadre doux « à venir » s'affiche à sa place — la mise en page ne
-casse jamais.
+Pour régénérer/optimiser : script `scratchpad/conv.py` (Pillow) — resize max
+1600 px + WebP q82. Total ~1,7 Mo pour les 7. Tant qu'un fichier manque, un
+cadre doux « à venir » s'affiche — la mise en page ne casse jamais.

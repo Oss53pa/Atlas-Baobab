@@ -112,7 +112,7 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
               </blockquote>
               <cite>De maman à maman, l’équipe Atlas Baobab</cite>
             </div>
-            <ArtImage name="fondatrice.png" alt="Une maman et son enfant, front contre front" ratio="1 / 1" className="founder-art" />
+            <ArtImage name="fondatrice.webp" alt="Une maman et son enfant, front contre front" ratio="4 / 5" className="founder-art" />
           </div>
         </div>
       </div>
@@ -130,7 +130,7 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
             <Pain emoji="🧭" title="L’avenir flou" text="École, forces, métier : un cap se dessine, pas à pas, à votre rythme." />
             <Pain emoji="🫂" title="L’épuisement" text="On veille aussi sur vous. Parce qu’un parent apaisé, c’est un enfant plus serein." />
           </div>
-          <ArtImage name="comprendre.png" alt="Un parent observe avec patience son enfant jouer aux cubes" ratio="4 / 3" className="art-band" />
+          <ArtImage name="comprendre.webp" alt="Un parent observe avec patience son enfant jouer aux cubes" ratio="4 / 3" className="art-band" />
         </div>
       </section>
 
@@ -147,7 +147,7 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
             <Step title="Orienter" text="École, forces, métier : un cap à discuter." />
             <Step title="S’épanouir" text="Un carnet de fiertés jusqu’à l’autonomie." />
           </div>
-          <ArtImage name="hero-famille.png" alt="Une famille réunie et sereine dans son salon" ratio="4 / 5" className="art-portrait" />
+          <ArtImage name="hero-famille.webp" alt="Une famille réunie et sereine dans son salon" ratio="5 / 4" className="art-band" />
         </div>
       </section>
 
@@ -175,7 +175,7 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
         <div className="lp-wrap">
           <div className="eyebrow"><i className="dot" /> Ce qui vous accompagne au quotidien</div>
           <h2 className="lp-h2">Des outils tendres et puissants, dans votre poche.</h2>
-          <ArtImage name="parole.png" alt="Un papa à hauteur de son enfant qui désigne un tableau d’images" ratio="4 / 3" className="art-band" />
+          <ArtImage name="parole.webp" alt="Un papa à hauteur de son enfant qui désigne un tableau d’images" ratio="4 / 3" className="art-band" />
 
           <Feature
             glyph="🧠" sparks={['💡', '🌙']} bg="linear-gradient(150deg,#f7f3ec,#e8f0e9)"
@@ -223,7 +223,7 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
               <span className="force-tag">💗 La tendresse</span>
               <span className="force-tag">🚗 Les passions intenses</span>
             </div>
-            <ArtImage name="celebrer.png" alt="Un enfant fier montre son dessin, son parent applaudit" ratio="4 / 3" className="art-band" />
+            <ArtImage name="celebrer.webp" alt="Un enfant fier montre son dessin, son parent applaudit" ratio="5 / 4" className="art-band" />
           </div>
         </div>
       </section>
@@ -261,7 +261,7 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
       {/* ── Manifeste ──────────────────────────────────────── */}
       <section className="lp-section">
         <div className="lp-wrap manifesto">
-          <ArtImage name="apaiser.png" alt="Une maman apaise son enfant dans un coin doux et calme" ratio="1 / 1" className="art-portrait" />
+          <ArtImage name="apaiser.webp" alt="Une maman apaise son enfant dans un coin doux et calme" ratio="1 / 1" className="art-portrait" />
           <blockquote>
             « On m’a dit tout ce que mon enfant ne ferait <span className="hl">jamais</span>.
             Personne ne m’a dit tout ce qu’il pouvait <span className="hl">devenir</span>. Alors nous l’avons construit. »
@@ -302,7 +302,7 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
       <section className="lp-section">
         <div className="lp-wrap">
           <div className="final-cta">
-            <ArtImage name="cta-baobab.png" alt="Un parent et son enfant marchent main dans la main vers un baobab au coucher du soleil" ratio="16 / 9" className="art-band" />
+            <ArtImage name="cta-baobab.webp" alt="Un parent et son enfant marchent main dans la main vers un baobab au coucher du soleil" ratio="3 / 2" className="art-band" />
             <div className="eyebrow" style={{ justifyContent: 'center', marginTop: 24 }}><i className="dot" /> 🌿 Le premier pas</div>
             <h2 className="lp-h2" style={{ margin: '12px auto 0' }}>Il est gratuit. Et il change déjà quelque chose.</h2>
             <p className="lp-lead2" style={{ margin: '12px auto 0' }}>Quelques secondes, sans compte, sans engagement. Juste pour souffler un peu.</p>
