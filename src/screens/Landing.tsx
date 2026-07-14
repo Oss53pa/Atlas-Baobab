@@ -131,7 +131,7 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
             <Pain emoji="🧭" title="L’avenir flou" text="École, forces, métier : un cap se dessine, pas à pas, à votre rythme." />
             <Pain emoji="🫂" title="L’épuisement" text="On veille aussi sur vous. Parce qu’un parent apaisé, c’est un enfant plus serein." />
           </div>
-          <ArtImage name="comprendre.webp" alt="Un parent observe avec patience son enfant jouer aux cubes" ratio="4 / 3" className="art-band" />
+          <ArtImage name="comprendre.webp" alt="Un parent observe avec patience son enfant jouer aux cubes" ratio="3 / 2" className="art-band" />
         </div>
       </section>
 
@@ -148,7 +148,7 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
             <Step title="Orienter" text="École, forces, métier : un cap à discuter." />
             <Step title="S’épanouir" text="Un carnet de fiertés jusqu’à l’autonomie." />
           </div>
-          <ArtImage name="hero-famille.webp" alt="Une famille réunie et sereine dans son salon" ratio="5 / 4" className="art-band" />
+          <ArtImage name="hero-famille.webp" alt="Une famille réunie et sereine dans son salon" ratio="3 / 2" className="art-band" />
         </div>
       </section>
 
