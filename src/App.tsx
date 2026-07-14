@@ -2,13 +2,13 @@ import { useState, useRef, useEffect } from 'react';
 import {
   Home, DoorOpen, NotebookPen, Brain, Settings, MessagesSquare, Sparkles,
   Compass, GraduationCap, ClipboardCheck, Route, FileText, Blocks, HandHeart,
-  Heart, ChevronDown, ShieldAlert, MessageCircleWarning,
+  Heart, ChevronDown, ShieldAlert, MessageCircleWarning, LogOut,
 } from 'lucide-react';
 import { MomentModal } from './components/MomentModal.js';
 import { getState, actions, useStore, activeChild } from './lib/store.js';
 import { ageYears } from './lib/format.js';
 import { dominantPalier } from './lib/paliers.js';
-import { useAuth } from './lib/auth.js';
+import { useAuth, signOut } from './lib/auth.js';
 import { Landing } from './screens/Landing.js';
 import { Login } from './screens/Login.js';
 import { ParentHome } from './screens/ParentHome.js';
@@ -117,6 +117,15 @@ export default function App() {
     if (v === 'enfant') { sessionStart.current = Date.now(); setMode({ kind: 'child', start: 'home' }); return; }
     if (v === 'enfant-calme') { sessionStart.current = Date.now(); setMode({ kind: 'child', start: 'calme' }); return; }
     setView(v);
+  };
+
+  // Revenir à la page d'accueil publique (landing) : on quitte l'espace parent.
+  // Un compte connecté est déconnecté pour repasser la porte d'entrée.
+  const quitToLanding = async () => {
+    try { await signOut(); } catch { /* pas de session : sans effet */ }
+    actions.setEntered(false);
+    setMode({ kind: 'parent' });
+    setView('accueil');
   };
 
   // Porte d'entrée : accueil public (landing) / connexion, tant que ni compte
@@ -238,6 +247,9 @@ export default function App() {
           <button className={`side-regl ${view === 'reglages' ? 'active' : ''}`} onClick={() => setView('reglages')}>
             <Settings size={18} /> <span>Réglages &amp; aidants</span>
           </button>
+          <button className="side-regl" onClick={quitToLanding} title="Revenir à la page d’accueil du site">
+            <LogOut size={18} /> <span>Revenir à l’accueil</span>
+          </button>
           <span className="side-veille"><i /> Veille « Temps difficile » : tout va bien</span>
         </div>
       </aside>
@@ -257,6 +269,9 @@ export default function App() {
               <button className="home-qa" onClick={() => go('enfant')}><MessageCircleWarning size={16} /> <span>CAA</span></button>
             </div>
           )}
+          <button className="topbar-quit" onClick={quitToLanding} title="Revenir à la page d’accueil du site">
+            <LogOut size={16} /> <span>Site</span>
+          </button>
           {logo(34)}
         </header>
 

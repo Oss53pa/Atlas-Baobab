@@ -18,6 +18,9 @@ export function ChildShell({ onExit, start = 'home' }: { onExit: () => void; sta
   const [armed, setArmed] = useState<string | null>(null);
   const [intro, setIntro] = useState(start === 'home');
   const [closing, setClosing] = useState(false);
+  const [exitHint, setExitHint] = useState(() => {
+    try { return !localStorage.getItem('ab-exit-hint-seen'); } catch { return false; }
+  });
   const armTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wasOver = useRef<boolean | null>(null);
   const preSignaled = useRef(false);
@@ -56,6 +59,18 @@ export function ChildShell({ onExit, start = 'home' }: { onExit: () => void; sta
     wasOver.current = over;
   }, [usedSeconds, child]);
 
+  // Indice de sortie (parent) : affiché une seule fois, se retire seul après 7 s.
+  useEffect(() => {
+    if (!exitHint) return;
+    const t = setTimeout(() => dismissExitHint(), 7000);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exitHint]);
+  function dismissExitHint() {
+    setExitHint(false);
+    try { localStorage.setItem('ab-exit-hint-seen', '1'); } catch { /* ignore */ }
+  }
+
   // Le rituel de fermeture se retire seul, en douceur (Loi : jamais d'arrêt brutal).
   useEffect(() => {
     if (!closing) return;
@@ -85,6 +100,12 @@ export function ChildShell({ onExit, start = 'home' }: { onExit: () => void; sta
     <div data-theme={child.active_theme} style={{ minHeight: '100vh' }}>
       {node}
       <ParentButton onHold={onExit} theme={child.active_theme} />
+      {exitHint && (
+        <button className="cs-exit-hint" onClick={dismissExitHint}>
+          <Key size={15} style={{ flex: '0 0 auto', marginTop: 1 }} />
+          <span>Appui long sur la clé pour revenir<small>Espace parent · 3 secondes</small></span>
+        </button>
+      )}
       {/* §10 · Rituel de fermeture : au revoir doux quand le temps est fini */}
       {closing && (
         <div className="cs-close" data-static={String(isStatic)}>
