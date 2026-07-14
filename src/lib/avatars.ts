@@ -32,6 +32,27 @@ export function avatarDef(key: AvatarKey): AvatarDef {
   return AVATARS.find((a) => a.key === key) ?? AVATARS[0];
 }
 
+/**
+ * Packs illustrés (webp, public/avatars/). Remplacent le glyphe emoji quand
+ * l'illustration existe ; sinon on retombe proprement sur l'emoji. Le set se
+ * complète au fil des illustrations livrées (pousse/luciole/caméléon à venir).
+ */
+export const AVATAR_IMG: Partial<Record<AvatarKey, string>> = {
+  tisserin: '/avatars/titi.webp',
+  tortue: '/avatars/momo.webp',
+};
+
+/** Chemin de l'illustration d'un avatar, ou null si seul l'emoji est dispo. */
+export function avatarImage(key: AvatarKey): string | null {
+  return AVATAR_IMG[key] ?? null;
+}
+
+/** Éléments illustrés hors-avatar (récompense, arbre des acquis). */
+export const ART = {
+  etoile: '/avatars/etoile.webp',
+  arbre: '/avatars/arbre.webp',
+} as const;
+
 /** Glyphe affiché, en tenant compte du stade de croissance (Pousse uniquement). */
 export function avatarGlyph(key: AvatarKey, growthStage = 1): string {
   const def = avatarDef(key);

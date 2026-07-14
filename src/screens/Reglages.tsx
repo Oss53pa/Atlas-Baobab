@@ -6,10 +6,11 @@ import { formatXof } from '../lib/format.js';
 import { useAuth, signInWithPassword, signUpWithPassword, signOut } from '../lib/auth.js';
 import { syncNow } from '../lib/sync.js';
 import {
-  AVATARS, avatarDisplayName, avatarGlyph, computeGrowthStage, isValidAvatarName,
+  AVATARS, avatarDisplayName, computeGrowthStage, isValidAvatarName,
   type AvatarMotion,
 } from '../lib/avatars.js';
 import { speak } from '../lib/tts.js';
+import { AvatarPic } from '../components/AvatarPic.js';
 
 const ROLE: Record<string, { role: string; e: string }> = {
   'Maman': { role: 'Parent', e: '👩🏾' }, 'Papa': { role: 'Parent', e: '👨🏾' },
@@ -46,7 +47,7 @@ export function Reglages() {
             <div className="section-title" style={{ marginTop: 0 }}>Profil de l’enfant</div>
             {child && (
               <div className="set-kid">
-                <span className="set-kid-av">{avatarGlyph(child.avatar_key, computeGrowthStage(growthPoints(child.id, state)))}</span>
+                <span className="set-kid-av"><AvatarPic akey={child.avatar_key} stage={computeGrowthStage(growthPoints(child.id, state))} /></span>
                 <div className="grow" style={{ minWidth: 0 }}>
                   <b style={{ fontSize: 17 }}>{child.first_name}</b>
                   <div className="muted" style={{ fontSize: 12.5 }}>{ageOf(child.birth_date)} · profil créé {createdAgo(child.created_at)} · portrait v{version}</div>
@@ -98,7 +99,7 @@ export function Reglages() {
               <div className="set-avs">
                 {AVATARS.map((a) => (
                   <button key={a.key} className={`set-av ${child.avatar_key === a.key ? 'on' : ''}`} onClick={() => actions.updateChild(child.id, { avatar_key: a.key })}>
-                    <span className="set-av-e">{avatarGlyph(a.key, 4)}</span><span className="set-av-n">{a.suggestedName}</span>
+                    <span className="set-av-e"><AvatarPic akey={a.key} stage={4} /></span><span className="set-av-n">{a.suggestedName}</span>
                   </button>
                 ))}
               </div>

@@ -3,9 +3,10 @@ import {
   ArrowUpRight, ArrowRight, ShieldCheck, WifiOff, Wallet, Users, Lock, BadgeCheck,
   HeartPulse, GraduationCap, Compass, Sparkles,
 } from 'lucide-react';
-import { AVATARS, avatarGlyph } from '../lib/avatars.js';
+import { AVATARS } from '../lib/avatars.js';
 import { KIND_GLYPH, KIND_TINT } from '../components/glyphs.js';
 import { ArtImage } from '../components/ArtImage.js';
+import { AvatarPic } from '../components/AvatarPic.js';
 import type { CSSProperties } from 'react';
 
 /** Apparition des cartes au défilement + parallaxe léger du visuel héro.
@@ -161,7 +162,7 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
             {AVATARS.map((a, i) => (
               <div className="compagnon" key={a.key}>
                 <div className={i % 2 ? 'face floaty-2' : 'face floaty'} style={{ background: ['#f1ebdf', '#e2ecee', '#ece8ef', '#f3e6de', '#e7eee2'][i] }}>
-                  {avatarGlyph(a.key, 4)}
+                  <AvatarPic akey={a.key} stage={4} />
                 </div>
                 <small>{a.suggestedName}</small>
               </div>

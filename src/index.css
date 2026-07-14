@@ -1537,6 +1537,11 @@ input.field::placeholder, textarea.field::placeholder { color: color-mix(in srgb
 .compagnon { text-align: center; }
 .compagnon .face { width: 70px; height: 70px; border-radius: 24px; display: grid; place-items: center; font-size: 36px; border: 1px solid var(--border); box-shadow: var(--shadow); }
 .compagnon small { display: block; margin-top: 7px; font-size: 12px; font-weight: 700; color: var(--text-muted); }
+/* Avatars illustrés (pack webp) : remplissent proprement leur pastille */
+.avatar-pic { display: block; object-fit: cover; }
+.compagnon .face, .set-kid-av { overflow: hidden; }
+.compagnon .face .avatar-pic, .set-kid-av .avatar-pic { width: 100%; height: 100%; border-radius: inherit; }
+.set-av-e .avatar-pic { width: 48px; height: 48px; border-radius: 14px; margin: 0 auto; }
 
 /* Célébration des forces */
 .forces-band { border-radius: 30px; padding: 44px 28px; text-align: center; background: radial-gradient(120% 120% at 50% 0%, color-mix(in srgb, var(--radar-green) 16%, transparent), transparent 60%), linear-gradient(135deg, #f7f3ec, #f1f5ee); border: 1px solid var(--border); box-shadow: var(--shadow); }
