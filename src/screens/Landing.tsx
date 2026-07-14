@@ -103,7 +103,6 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
       <div className="lp-wrap" style={{ paddingBottom: 8 }}>
         <div className="founder">
           <div className="row" style={{ gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-            <span className="face">👩🏾</span>
             <div style={{ flex: 1, minWidth: 240 }}>
               <div className="eyebrow"><i className="dot" /> Le mot qui a tout lancé</div>
               <blockquote style={{ marginTop: 10 }}>
