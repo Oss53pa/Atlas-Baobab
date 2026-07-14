@@ -135,15 +135,43 @@ export function ChildShell({ onExit, start = 'home' }: { onExit: () => void; sta
 
   return wrap(
     <div className={`child-scene ${isStatic ? 'static' : ''}`} data-theme={child.active_theme}>
+      {/* En-tête d'accueil chaleureux */}
+      <div className="cs-greet" aria-hidden>
+        <h1>Salut {child.first_name} <span className="cs-wave">👋</span></h1>
+        <p>Que veux-tu faire aujourd’hui ?</p>
+        <span className="cs-greet-div"><i /><span>🌿</span><i /></span>
+      </div>
       <svg viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="cs-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={skyTop} /><stop offset="1" style={{ stopColor: 'var(--bg)' }} /></linearGradient>
         </defs>
         <rect width="1000" height="620" fill="url(#cs-sky)" />
-        <circle cx="810" cy="110" r="46" fill="#F2DFAE" opacity=".8" />
-        <circle cx="810" cy="110" r="64" fill="#F2DFAE" opacity=".22" />
+        <circle cx="812" cy="104" r="46" fill="#F4D98C" opacity=".9" />
+        <circle cx="812" cy="104" r="66" fill="#F4D98C" opacity=".22" />
+        {/* Nuages doux */}
+        <g fill="#FFFFFF" opacity=".92" className={isStatic ? '' : 'cs-floaty'}>
+          <ellipse cx="716" cy="150" rx="34" ry="18" />
+          <ellipse cx="750" cy="142" rx="24" ry="15" />
+          <ellipse cx="686" cy="144" rx="20" ry="12" />
+        </g>
+        <ellipse cx="176" cy="96" rx="26" ry="14" fill="#FFFFFF" opacity=".8" />
+        <ellipse cx="204" cy="90" rx="18" ry="11" fill="#FFFFFF" opacity=".8" />
+        {/* Feuilles qui flottent */}
+        <g className={isStatic ? '' : 'cs-leaf1'} style={{ fill: 'color-mix(in srgb, var(--primary) 55%, #fff)' }}>
+          <path d="M596 118 q20 -12 34 4 q-16 16 -34 -4 Z" />
+        </g>
+        <g className={isStatic ? '' : 'cs-leaf2'} style={{ fill: 'color-mix(in srgb, var(--accent) 62%, #fff)' }}>
+          <path d="M902 250 q16 -10 28 3 q-13 13 -28 -3 Z" />
+        </g>
         <ellipse cx="230" cy="640" rx="560" ry="240" style={{ fill: 'color-mix(in srgb, var(--primary) 22%, var(--tile))' }} />
         <ellipse cx="820" cy="680" rx="620" ry="270" style={{ fill: 'color-mix(in srgb, var(--primary) 30%, var(--tile))' }} />
+        {/* Petites fleurs */}
+        {[[120, 486, '#F2C94C'], [352, 512, '#E9A6B6'], [636, 520, '#F2C94C'], [566, 470, '#EFCB63']].map(([x, y, c], i) => (
+          <g key={i} transform={`translate(${x},${y})`}>
+            {[0, 72, 144, 216, 288].map((a) => <ellipse key={a} cx="0" cy="-6" rx="3.4" ry="6" fill={c as string} transform={`rotate(${a})`} />)}
+            <circle cx="0" cy="0" r="3" fill="#FBF3DE" />
+          </g>
+        ))}
 
         {/* Baobab de l'enfant */}
         <g>
@@ -201,14 +229,14 @@ export function ChildShell({ onExit, start = 'home' }: { onExit: () => void; sta
 
       {/* Zones tactiles géantes */}
       <button className="cs-zone" style={{ left: '3%', top: '17%', width: '35%', height: '50%' }} onClick={() => tapZone('arbre', 'Mon arbre', () => setView('arbre'))}>
-        <span className="cs-zlabel" style={{ bottom: '8%' }}>🌳 Mon arbre</span>
+        <span className="cs-zlabel" style={{ bottom: '8%' }}><span className="cs-zi">🌳</span><span>Mon arbre</span><span className="cs-zc">›</span></span>
       </button>
       <button className={`cs-zone ${overQuota ? 'muted' : ''}`} style={{ left: '62%', top: '42%', width: '35%', height: '34%' }}
         onClick={() => overQuota ? speak(rc.quotaSpeak) : tapZone('jouer', 'Jouer', () => setView('game'))}>
-        <span className="cs-zlabel" style={{ bottom: '3%' }}>🧩 {overQuota ? rc.quotaZone : 'Jouer'}</span>
+        <span className="cs-zlabel" style={{ bottom: '3%' }}><span className="cs-zi">🧩</span><span>{overQuota ? rc.quotaZone : 'Jouer'}</span>{!overQuota && <span className="cs-zc">›</span>}</span>
       </button>
       <button className="cs-zone" style={{ left: '38%', top: '58%', width: '26%', height: '22%' }} onClick={() => tapZone('bulle', 'Ma bulle', () => setView('calme'))}>
-        <span className="cs-zlabel" style={{ bottom: '2%' }}>🫧 Ma bulle</span>
+        <span className="cs-zlabel" style={{ bottom: '2%' }}><span className="cs-zi">🫧</span><span>Ma bulle</span><span className="cs-zc">›</span></span>
       </button>
       <button className="cs-zone" style={{ left: '42%', top: '33%', width: '16%', height: '22%' }} onClick={() => speak(`Bonjour ${child.first_name} !`)} aria-label="Bibo" />
 
@@ -216,6 +244,13 @@ export function ChildShell({ onExit, start = 'home' }: { onExit: () => void; sta
       <button className="cs-talk" onClick={() => { speak('Je parle'); setView('caa'); }}>
         <span className="cs-talk-pic">💬</span><span className="cs-talk-name">Je parle</span>
       </button>
+
+      {/* Bandeau de réassurance (doux, non interactif) */}
+      <div className="cs-foot" aria-hidden>
+        <span className="cs-foot-i"><b>🛡️</b> Sécurisé</span>
+        <span className="cs-foot-i"><b>🌿</b> Bienveillant</span>
+        <span className="cs-foot-i"><b>💚</b> À ton rythme</span>
+      </div>
 
       {/* E0 · Rituel d'ouverture */}
       {intro && (
