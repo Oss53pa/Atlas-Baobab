@@ -164,16 +164,6 @@ export function ChildShell({ onExit, start = 'home' }: { onExit: () => void; sta
         <g className={isStatic ? '' : 'cs-leaf2'} style={{ fill: 'color-mix(in srgb, var(--accent) 62%, #fff)' }}>
           <path d="M902 250 q16 -10 28 3 q-13 13 -28 -3 Z" />
         </g>
-        <ellipse cx="230" cy="640" rx="560" ry="240" style={{ fill: 'color-mix(in srgb, var(--primary) 22%, var(--tile))' }} />
-        <ellipse cx="820" cy="680" rx="620" ry="270" style={{ fill: 'color-mix(in srgb, var(--primary) 30%, var(--tile))' }} />
-        {/* Petites fleurs */}
-        {[[120, 486, '#F2C94C'], [352, 512, '#E9A6B6'], [636, 520, '#F2C94C'], [566, 470, '#EFCB63']].map(([x, y, c], i) => (
-          <g key={i} transform={`translate(${x},${y})`}>
-            {[0, 72, 144, 216, 288].map((a) => <ellipse key={a} cx="0" cy="-6" rx="3.4" ry="6" fill={c as string} transform={`rotate(${a})`} />)}
-            <circle cx="0" cy="0" r="3" fill="#FBF3DE" />
-          </g>
-        ))}
-
         {/* Décor illustré : baobab, mare (Ma bulle), Bibo, panier (Jouer) */}
         <image href="/child/decor.webp" x="0" y="0" width="1000" height="620" preserveAspectRatio="xMidYMid slice" />
         {/* Sablier du quota, par-dessus le décor (près du panier « Jouer ») */}
