@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Key } from 'lucide-react';
-import { activeChild, acquiredCompetences, growthPoints, useAppState } from '../../lib/store.js';
-import { avatarGlyph, computeGrowthStage, ART } from '../../lib/avatars.js';
+import { actions, activeChild, useAppState } from '../../lib/store.js';
+import { avatarGlyph, ART } from '../../lib/avatars.js';
 import { childRegistre, registreCopy } from '../../lib/paliers.js';
 import { speak } from '../../lib/tts.js';
 import { Caa } from './Caa.js';
@@ -88,17 +88,23 @@ export function ChildShell({ onExit, start = 'home' }: { onExit: () => void; sta
   const isStatic = child.avatar_motion === 'static';
   const rc = registreCopy(childRegistre(child.id, state));
 
-  const acquired = acquiredCompetences(child.id, state);
-  const stage = computeGrowthStage(growthPoints(child.id, state));
-  const leaves = Math.min(6, acquired);
-  const hasFruit = acquired >= 4 || stage >= 4;
-
   const hr = new Date().getHours();
   const skyTop = hr < 11 ? '#F6EFDF' : hr < 18 ? '#F3EDE0' : '#F3E9E0';
+
+  // Protocole « je ne suis pas bien » (CDC Kessy §6) : un tap, aucune confirmation,
+  // toujours à la même place sur tous les écrans. Note neutre + redirection immédiate
+  // vers Ma Bulle, aucun nouveau choix à faire en pleine détresse.
+  function distress() {
+    actions.logChildPause();
+    setView('calme');
+  }
 
   const wrap = (node: React.ReactNode) => (
     <div data-theme={child.active_theme} style={{ minHeight: '100vh' }}>
       {node}
+      <button className="cs-distress" onClick={distress} aria-label="Une pause">
+        {child.exit_pictogram ?? '🫧'}
+      </button>
       <ParentButton onHold={onExit} theme={child.active_theme} />
       {exitHint && (
         <button className="cs-exit-hint" onClick={dismissExitHint}>
@@ -128,11 +134,6 @@ export function ChildShell({ onExit, start = 'home' }: { onExit: () => void; sta
     if (armTimer.current) clearTimeout(armTimer.current);
     armTimer.current = setTimeout(() => setArmed(null), 2600);
   }
-  const LEAF = [
-    { x: 176, y: 196, r: -20 }, { x: 238, y: 158, r: 12 }, { x: 292, y: 188, r: 28 },
-    { x: 210, y: 242, r: -8 }, { x: 268, y: 240, r: 18 }, { x: 146, y: 238, r: -30 },
-  ];
-
   return wrap(
     <div className={`child-scene ${isStatic ? 'static' : ''}`} data-theme={child.active_theme}>
       {/* En-tête d'accueil chaleureux */}
@@ -173,57 +174,12 @@ export function ChildShell({ onExit, start = 'home' }: { onExit: () => void; sta
           </g>
         ))}
 
-        {/* Baobab de l'enfant */}
-        <g>
-          <path d="M205 470 C200 380 190 340 208 300 C186 300 172 282 178 262 C150 268 132 246 142 226 C120 228 108 208 120 192 C138 168 196 158 232 176 C286 160 330 190 322 226 C348 234 350 266 326 278 C342 300 326 322 300 318 C310 360 300 400 296 470 Z" fill="#B98A5A" />
-          <circle cx="150" cy="212" r="52" style={{ fill: 'color-mix(in srgb, var(--primary) 78%, #fff)' }} />
-          <circle cx="222" cy="178" r="64" style={{ fill: 'color-mix(in srgb, var(--primary) 62%, #fff)' }} />
-          <circle cx="300" cy="212" r="54" style={{ fill: 'color-mix(in srgb, var(--primary) 78%, #fff)' }} />
-          <circle cx="232" cy="236" r="58" style={{ fill: 'color-mix(in srgb, var(--primary) 55%, #fff)' }} />
-          <g fill="#EDF6EA">
-            {LEAF.slice(0, leaves).map((l, i) => <ellipse key={i} cx={l.x} cy={l.y} rx="9" ry="14" transform={`rotate(${l.r} ${l.x} ${l.y})`} />)}
-          </g>
-          {hasFruit && (<><circle cx="252" cy="264" r="11" style={{ fill: 'var(--accent)' }} /><path d="M252 253 q3 -8 10 -9" stroke="#B98A5A" strokeWidth="3" fill="none" strokeLinecap="round" /></>)}
-        </g>
-
-        {/* Natte + panier (Jouer) + sablier du quota */}
-        <g transform="translate(700,362)">
-          <ellipse cx="60" cy="86" rx="130" ry="34" style={{ fill: 'color-mix(in srgb, var(--accent) 22%, var(--tile))' }} />
-          {!overQuota && (<>
-            <path d="M10 60 q50 26 100 0 l-8 34 q-42 20 -84 0 Z" fill="#C89B66" />
-            <path d="M10 60 q50 26 100 0" fill="none" stroke="#B98A5A" strokeWidth="5" />
-            <circle cx="34" cy="48" r="15" style={{ fill: 'color-mix(in srgb, var(--secondary, #9DBBC6) 90%, #fff)' }} />
-            <rect x="58" y="30" width="26" height="26" rx="7" style={{ fill: 'var(--accent)' }} />
-            <circle cx="98" cy="46" r="12" style={{ fill: 'var(--primary)' }} />
-          </>)}
-          <g transform="translate(120,-6)" className={preSignal ? 'cs-hourglass presignal' : 'cs-hourglass'}>
-            <rect x="0" y="0" width="52" height="12" rx="6" fill="#EFE8D8" />
-            <rect x="0" y="0" width={Math.round(52 * remainFrac)} height="12" rx="6" style={{ fill: 'var(--primary)' }} />
-          </g>
-        </g>
-
-        {/* Ma bulle : la mare */}
-        <g transform="translate(455,415)">
-          <ellipse cx="60" cy="52" rx="112" ry="30" style={{ fill: 'color-mix(in srgb, var(--secondary, #9DBBC6) 40%, var(--surface))' }} />
-          <ellipse cx="60" cy="52" rx="112" ry="30" fill="none" style={{ stroke: 'color-mix(in srgb, var(--secondary, #9DBBC6) 55%, var(--surface))' }} strokeWidth="4" />
-          <g className="cs-floaty">
-            <circle cx="46" cy="16" r="17" style={{ fill: 'var(--surface)', stroke: 'color-mix(in srgb, var(--secondary, #9DBBC6) 50%, var(--surface))' }} strokeWidth="3" />
-            <circle cx="84" cy="2" r="11" style={{ fill: 'var(--surface)', stroke: 'color-mix(in srgb, var(--secondary, #9DBBC6) 50%, var(--surface))' }} strokeWidth="3" />
-            <circle cx="104" cy="26" r="7" style={{ fill: 'var(--surface)', stroke: 'color-mix(in srgb, var(--secondary, #9DBBC6) 50%, var(--surface))' }} strokeWidth="3" />
-          </g>
-        </g>
-
-        {/* Bibo */}
-        <g transform="translate(468,258)">
-          <g className="cs-breathe">
-            <ellipse cx="32" cy="96" rx="40" ry="10" fill="#3E3A35" opacity=".08" />
-            <path d="M32 92 C30 66 28 52 32 38" style={{ stroke: 'var(--primary)' }} strokeWidth="9" fill="none" strokeLinecap="round" />
-            <ellipse cx="14" cy="34" rx="17" ry="24" style={{ fill: 'color-mix(in srgb, var(--primary) 78%, #fff)' }} transform="rotate(-24 14 34)" />
-            <ellipse cx="50" cy="30" rx="17" ry="24" style={{ fill: 'color-mix(in srgb, var(--primary) 62%, #fff)' }} transform="rotate(24 50 30)" />
-            <circle cx="24" cy="30" r="3.4" fill="#3E3A35" />
-            <circle cx="40" cy="30" r="3.4" fill="#3E3A35" />
-            <path d="M25 41 q7 6 14 0" stroke="#3E3A35" strokeWidth="3" fill="none" strokeLinecap="round" />
-          </g>
+        {/* Décor illustré : baobab, mare (Ma bulle), Bibo, panier (Jouer) */}
+        <image href="/child/decor.webp" x="0" y="0" width="1000" height="620" preserveAspectRatio="xMidYMid slice" />
+        {/* Sablier du quota, par-dessus le décor (près du panier « Jouer ») */}
+        <g transform="translate(812,352)" className={preSignal ? 'cs-hourglass presignal' : 'cs-hourglass'}>
+          <rect x="0" y="0" width="52" height="12" rx="6" fill="#EFE8D8" />
+          <rect x="0" y="0" width={Math.round(52 * remainFrac)} height="12" rx="6" style={{ fill: 'var(--primary)' }} />
         </g>
       </svg>
 

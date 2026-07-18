@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { activeChild, useAppState } from '../../lib/store.js';
-import { avatarDisplayName, avatarGlyph, avatarLine } from '../../lib/avatars.js';
+import { avatarDisplayName, avatarLine } from '../../lib/avatars.js';
+import { AvatarPic } from '../../components/AvatarPic.js';
 
 /** Coin Calme (CDC §E5) : bulle de régulation, respiration guidée visuelle.
  * L'Avatar respire avec l'enfant (C02 §C2.4). Limité à 10 min par session. */
@@ -30,7 +31,7 @@ export function CoinCalme({ onExit }: { onExit: () => void }) {
       </div>
 
       <div style={{ textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <div className="breath" style={{ fontSize: 64 }}>{child ? avatarGlyph(child.avatar_key) : '🫧'}</div>
+        <div className="breath">{child ? <AvatarPic akey={child.avatar_key} className="breath-av" /> : '🫧'}</div>
         <p style={{ fontFamily: 'var(--font-child)', fontWeight: 800, fontSize: 22, marginTop: 10 }}>{phase}…</p>
         {child && (
           <p className="muted" style={{ fontFamily: 'var(--font-child)', fontSize: 13, marginTop: 4 }}>

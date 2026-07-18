@@ -40,6 +40,11 @@ export const GAME_DOMAINS: Record<string, GameDomain[]> = {
   combien: ['quantites'],
   chemin: ['motricite_fine'],
   regarde: ['communication', 'attention'],
+  association: ['attention'],
+  sequenceur: ['sequencage'],
+  puzzle: ['motricite_fine'],
+  emotions: ['communication'],
+  chasse: ['attention'],
 };
 const ALL_DOMAINS = Object.keys(DOMAIN_LABEL) as GameDomain[];
 

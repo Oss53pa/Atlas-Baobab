@@ -102,6 +102,12 @@ function normalize(s: AppState): AppState {
     ...c,
     avatar_key: c.avatar_key ?? 'pousse',
     avatar_motion: c.avatar_motion ?? 'slow',
+    communication_level: c.communication_level ?? 'verbal',
+    sensory_input: c.sensory_input ?? { auditory: 'neutral', visual: 'neutral', tactile: 'neutral', vestibular: 'neutral' },
+    support_level: c.support_level ?? 'autonomous',
+    interests: c.interests ?? [],
+    sensitivities_to_avoid: c.sensitivities_to_avoid ?? [],
+    professional_sharing_enabled: c.professional_sharing_enabled ?? false,
   }));
   if (!s.forumThreads || !s.forumPosts) {
     const f = seedForums();
@@ -229,6 +235,16 @@ export function twinProfile(childId: string, s: AppState = state): TwinProfile {
   );
 }
 
+/** Nombre de pauses détresse (bouton enfant, CDC Kessy §6) sur les 7 derniers jours.
+ * Même convention que `isHardTime` (coach.ts) : fenêtre glissante, seuil ≥3 côté UI. */
+export function childPauseCount7d(childId: string, s: AppState = state, nowMs = Date.now()): number {
+  return s.incidents.filter(
+    (i) => i.child_id === childId
+      && i.context?.source === 'child_button'
+      && nowMs - Date.parse(i.started_at) < 7 * 24 * 3600 * 1000,
+  ).length;
+}
+
 export function tensionToday(childId: string, s: AppState = state): TensionScore {
   const profile = twinProfile(childId, s);
   return computeTensionScore(
@@ -303,6 +319,31 @@ export const actions = {
       started_at: details.startedAt, ended_at: details.endedAt,
       suspected_trigger: details.suspected, what_helped: details.whatHelped,
       guidance_feedback: details.feedback, context,
+    };
+    set({
+      ...state,
+      observations: [obs, ...state.observations],
+      incidents: [incident, ...state.incidents],
+    });
+  },
+
+  /** Protocole « je ne suis pas bien » côté enfant (CDC Kessy §6) : un tap, aucune
+   * confirmation. Note factuelle et neutre — aucune interprétation, juste l'horodatage
+   * et la destination (Ma Bulle). Réutilise le vocabulaire incident/observation existant
+   * pour alimenter naturellement Journal/CORTEX/Radar, sans canal parallèle. */
+  logChildPause(): void {
+    const childId = state.activeChildId;
+    if (!childId) return;
+    const obsId = uid();
+    const at = new Date().toISOString();
+    const context = { source: 'child_button' };
+    const obs: Observation = {
+      id: obsId, child_id: childId, device_id: state.settings.deviceId,
+      kind: 'incident', occurred_at: at, author: 'Enfant', context,
+    };
+    const incident = {
+      id: uid(), child_id: childId, observation_id: obsId,
+      started_at: at, what_helped: ['Ma Bulle'], context,
     };
     set({
       ...state,
@@ -515,6 +556,12 @@ export const actions = {
       created_at: new Date().toISOString(),
       avatar_key: 'pousse',
       avatar_motion: 'slow',
+      communication_level: 'verbal',
+      sensory_input: { auditory: 'neutral', visual: 'neutral', tactile: 'neutral', vestibular: 'neutral' },
+      support_level: 'autonomous',
+      interests: [],
+      sensitivities_to_avoid: [],
+      professional_sharing_enabled: false,
     };
     set({
       ...state,

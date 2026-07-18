@@ -4,6 +4,20 @@ import type { AvatarKey, AvatarMotion } from './avatars.js';
 
 export type { ChildThemeKey };
 
+export type CommunicationLevel = 'verbal' | 'verbal_emergent' | 'non_verbal_aac' | 'non_verbal_no_aac';
+export type SupportLevel = 'autonomous' | 'partial' | 'full';
+export type SensoryPref = 'hyper' | 'hypo' | 'neutral';
+
+/** Profil sensoriel DÉCLARÉ par le parent (CDC Kessy §3.1), un canal → une préférence.
+ * Distinct de `TwinProfile.sensory` (packages/twin-engine) qui est CALCULÉ depuis les
+ * observations sur 8 canaux avec score/confiance — ne jamais confondre les deux. */
+export interface SensoryInput {
+  auditory: SensoryPref;
+  visual: SensoryPref;
+  tactile: SensoryPref;
+  vestibular: SensoryPref;
+}
+
 export interface Child {
   id: string;
   first_name: string;
@@ -16,6 +30,20 @@ export interface Child {
   avatar_key: AvatarKey;
   avatar_custom_name?: string | null;
   avatar_motion: AvatarMotion;
+  /** Profil fonctionnel (CDC Kessy §3.1-3.3), saisi parent, modifiable à tout moment. */
+  communication_level?: CommunicationLevel;
+  /** Système CAA déjà utilisé en famille (PECS, pictogrammes, tablette…), si renseigné. */
+  aac_system?: string | null;
+  sensory_input?: SensoryInput;
+  support_level?: SupportLevel;
+  interests?: string[];
+  sensitivities_to_avoid?: string[];
+  /** Pictogramme de sortie déjà utilisé en famille (CDC §6), utilisé par le bouton détresse. */
+  exit_pictogram?: string | null;
+  /** ISO. Pilote le rappel « à revoir tous les 3 mois » (§3.1). */
+  profile_reviewed_at?: string;
+  /** Partage avec un professionnel référent (§7) — jamais activé par défaut. */
+  professional_sharing_enabled?: boolean;
 }
 
 /** Observation locale = ObservationInput (Jumeau) + rattachements. */

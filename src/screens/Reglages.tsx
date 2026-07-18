@@ -11,6 +11,17 @@ import {
 } from '../lib/avatars.js';
 import { speak } from '../lib/tts.js';
 import { AvatarPic } from '../components/AvatarPic.js';
+import { INTEREST_SUGGESTIONS, profileNeedsReview, SENSORY_PREF_LABEL } from '../lib/childProfile.js';
+import type { CommunicationLevel, SensoryPref, SupportLevel } from '../lib/types.js';
+
+const COMM_LABEL: Record<CommunicationLevel, string> = {
+  verbal: 'Verbal fluide', verbal_emergent: 'Verbal émergent',
+  non_verbal_aac: 'Non-verbal · utilise la CAA', non_verbal_no_aac: 'Non-verbal ou peu verbal',
+};
+const SUPPORT_LABEL: Record<SupportLevel, string> = {
+  autonomous: 'Autonome', partial: 'Accompagnement partiel', full: 'Accompagnement complet',
+};
+const SENSORY_CHANNEL_LABEL = { auditory: 'Auditif', visual: 'Visuel', tactile: 'Tactile', vestibular: 'Vestibulaire' } as const;
 
 const ROLE: Record<string, { role: string; e: string }> = {
   'Maman': { role: 'Parent', e: '👩🏾' }, 'Papa': { role: 'Parent', e: '👨🏾' },
@@ -25,6 +36,7 @@ export function Reglages() {
   const [newBirth, setNewBirth] = useState('');
   const [nameDraft, setNameDraft] = useState(child?.avatar_custom_name ?? '');
   const [addOpen, setAddOpen] = useState(false);
+  const [sensitivityDraft, setSensitivityDraft] = useState('');
 
   const team = useMemo(() => {
     if (!child) return [];
@@ -133,6 +145,102 @@ export function Reglages() {
               </div>
               <div className="set-sanct">« Je parle » (sa voix) et « Ma bulle » ne sont <b>jamais</b> comptés ni bloqués. Jamais.</div>
               <p className="muted" style={{ fontSize: 11.5, marginTop: 8 }}>Modification protégée par votre code PIN. Seuls les jeux sont concernés.</p>
+            </div>
+
+            {/* Profil fonctionnel (CDC Kessy §3) : non-diagnostique, reconfigure l'app en douceur. */}
+            <div className="card">
+              <div className="section-title" style={{ marginTop: 0 }}>Profil de {child.first_name}</div>
+              <p className="muted" style={{ fontSize: 12, marginBottom: 10 }}>Pas un diagnostic — juste de quoi adapter l’app à {child.first_name}. Modifiable à tout moment.</p>
+
+              {profileNeedsReview(child) && (
+                <p className="notice" style={{ marginBottom: 10 }}>Ça a peut-être changé — prenez un moment pour revoir ce profil.</p>
+              )}
+
+              <div className="muted" style={{ fontSize: 12, marginBottom: 4 }}>Communication</div>
+              <div className="set-seg" style={{ flexWrap: 'wrap' }}>
+                {(Object.keys(COMM_LABEL) as CommunicationLevel[]).map((v) => (
+                  <button key={v} className={child.communication_level === v ? 'on' : ''}
+                    onClick={() => actions.updateChild(child.id, { communication_level: v, profile_reviewed_at: new Date().toISOString() })}>
+                    {COMM_LABEL[v]}
+                  </button>
+                ))}
+              </div>
+              {(child.communication_level === 'non_verbal_aac') && (
+                <input className="field" style={{ marginTop: 8 }} placeholder="Quel système ? (PECS, pictogrammes, tablette…)"
+                  value={child.aac_system ?? ''} onChange={(e) => actions.updateChild(child.id, { aac_system: e.target.value })} />
+              )}
+
+              <div className="muted" style={{ fontSize: 12, margin: '14px 0 4px' }}>Profil sensoriel par canal</div>
+              {(Object.keys(SENSORY_CHANNEL_LABEL) as (keyof typeof SENSORY_CHANNEL_LABEL)[]).map((ch) => (
+                <div key={ch} className="row" style={{ gap: 8, alignItems: 'center', marginTop: 6 }}>
+                  <span className="muted" style={{ fontSize: 12, width: 92, flex: '0 0 auto' }}>{SENSORY_CHANNEL_LABEL[ch]}</span>
+                  <div className="set-seg" style={{ flex: 1 }}>
+                    {(['hyper', 'hypo', 'neutral'] as SensoryPref[]).map((p) => (
+                      <button key={p} className={child.sensory_input?.[ch] === p ? 'on' : ''}
+                        onClick={() => actions.updateChild(child.id, {
+                          sensory_input: { auditory: 'neutral', visual: 'neutral', tactile: 'neutral', vestibular: 'neutral', ...child.sensory_input, [ch]: p },
+                          profile_reviewed_at: new Date().toISOString(),
+                        })}>
+                        {SENSORY_PREF_LABEL[p]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              <div className="muted" style={{ fontSize: 12, margin: '14px 0 4px' }}>Niveau de soutien nécessaire</div>
+              <div className="set-seg">
+                {(Object.keys(SUPPORT_LABEL) as SupportLevel[]).map((v) => (
+                  <button key={v} className={child.support_level === v ? 'on' : ''}
+                    onClick={() => actions.updateChild(child.id, { support_level: v, profile_reviewed_at: new Date().toISOString() })}>
+                    {SUPPORT_LABEL[v]}
+                  </button>
+                ))}
+              </div>
+
+              <div className="muted" style={{ fontSize: 12, margin: '14px 0 4px' }}>Intérêts spécifiques</div>
+              <div className="row wrap" style={{ gap: 6 }}>
+                {INTEREST_SUGGESTIONS.map((i) => {
+                  const on = child.interests?.includes(i) ?? false;
+                  return (
+                    <button key={i} className="chip" style={on ? { background: 'var(--primary)', color: 'var(--primary-ink)', borderColor: 'transparent' } : undefined}
+                      onClick={() => actions.updateChild(child.id, {
+                        interests: on ? (child.interests ?? []).filter((x) => x !== i) : [...(child.interests ?? []), i],
+                      })}>
+                      {i}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="muted" style={{ fontSize: 12, margin: '14px 0 4px' }}>Sensibilités à éviter (sons, couleurs, contact visuel imposé…)</div>
+              <div className="row" style={{ gap: 8 }}>
+                <input className="field" placeholder="Ex. sons aigus" value={sensitivityDraft} onChange={(e) => setSensitivityDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key !== 'Enter' || !sensitivityDraft.trim()) return;
+                    actions.updateChild(child.id, { sensitivities_to_avoid: [...(child.sensitivities_to_avoid ?? []), sensitivityDraft.trim()] });
+                    setSensitivityDraft('');
+                  }} />
+              </div>
+              {!!child.sensitivities_to_avoid?.length && (
+                <div className="row wrap" style={{ gap: 6, marginTop: 8 }}>
+                  {child.sensitivities_to_avoid.map((s, i) => (
+                    <button key={i} className="chip" onClick={() => actions.updateChild(child.id, { sensitivities_to_avoid: child.sensitivities_to_avoid!.filter((_, j) => j !== i) })}>
+                      {s} ✕
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className="muted" style={{ fontSize: 12, margin: '14px 0 4px' }}>Pictogramme de la pause « je ne suis pas bien »</div>
+              <input className="field" placeholder="Émoji déjà utilisé en famille (par défaut 🫧)" maxLength={4}
+                value={child.exit_pictogram ?? ''} onChange={(e) => actions.updateChild(child.id, { exit_pictogram: e.target.value || null })} />
+
+              <div className="set-drow" style={{ marginTop: 14 }}>
+                <div className="grow"><b style={{ fontSize: 14 }}>Partage avec un professionnel référent</b><div className="muted" style={{ fontSize: 11.5 }}>jamais activé par défaut</div></div>
+                <button className={`switch ${child.professional_sharing_enabled ? 'on' : ''}`}
+                  onClick={() => actions.updateChild(child.id, { professional_sharing_enabled: !child.professional_sharing_enabled })} aria-label="Partage professionnel"><i /></button>
+              </div>
             </div>
           </>)}
         </div>

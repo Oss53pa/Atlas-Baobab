@@ -11,6 +11,11 @@ import { GameMaison } from './games/GameMaison.js';
 import { GameCombien } from './games/GameCombien.js';
 import { GameChemin } from './games/GameChemin.js';
 import { GameRegarde } from './games/GameRegarde.js';
+import { GameAssociation } from './games/GameAssociation.js';
+import { GameSequenceur } from './games/GameSequenceur.js';
+import { GamePuzzle } from './games/GamePuzzle.js';
+import { GameEmotions } from './games/GameEmotions.js';
+import { GameChasse } from './games/GameChasse.js';
 import type { GameProps } from './games/gameKit.js';
 
 /**
@@ -26,6 +31,11 @@ const GAME_COMPONENTS: Record<string, (p: GameProps) => JSX.Element> = {
   combien: GameCombien,
   chemin: GameChemin,
   regarde: GameRegarde,
+  association: GameAssociation,
+  sequenceur: GameSequenceur,
+  puzzle: GamePuzzle,
+  emotions: GameEmotions,
+  chasse: GameChasse,
 };
 // Domaine sondé de référence, pour le niveau de départ de chaque jeu.
 const GAME_MAIN_DOMAIN: Record<string, GameDomain> = {
@@ -36,6 +46,11 @@ const GAME_MAIN_DOMAIN: Record<string, GameDomain> = {
   combien: GAME_DOMAINS.combien[0],
   chemin: GAME_DOMAINS.chemin[0],
   regarde: GAME_DOMAINS.regarde[0],
+  association: GAME_DOMAINS.association[0],
+  sequenceur: GAME_DOMAINS.sequenceur[0],
+  puzzle: GAME_DOMAINS.puzzle[0],
+  emotions: GAME_DOMAINS.emotions[0],
+  chasse: GAME_DOMAINS.chasse[0],
 };
 
 export function JouerHub({ onExit, onBulle }: { onExit: () => void; onBulle?: () => void }) {

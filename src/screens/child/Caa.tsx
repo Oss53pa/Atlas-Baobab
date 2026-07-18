@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Volume2, Eraser, ArrowLeft } from 'lucide-react';
 import { activeChild, actions, useAppState } from '../../lib/store.js';
 import { AAC_CATEGORIES, defaultBoard } from '../../lib/caa.js';
+import { reconfig } from '../../lib/childProfile.js';
 import { speak } from '../../lib/tts.js';
 import type { AacCard } from '../../lib/types.js';
 
@@ -11,13 +12,20 @@ export function Caa({ onExit }: { onExit: () => void }) {
   const board = (child && state.aacBoards[child.id]) || defaultBoard();
   const [cat, setCat] = useState('base');
   const [sentence, setSentence] = useState<AacCard[]>([]);
+  const ttsDefault = child ? reconfig(child).ttsDefault : false;
 
   const cards = useMemo(() => board.cards.filter((c) => c.category === cat), [board, cat]);
 
   function press(card: AacCard) {
     speak(card.label);           // latence tap-vers-voix minimale (CDC §E4)
     actions.pressAacCard(card);  // journal d'usage CAA (flux profil communication)
-    setSentence((s) => (s.length >= 6 ? s : [...s, card]));
+    setSentence((s) => {
+      const next = s.length >= 6 ? s : [...s, card];
+      // Communication non-verbale (CDC Kessy §3.2) : relit la phrase construite à
+      // chaque ajout, sans exiger un tap supplémentaire sur « Parler ».
+      if (ttsDefault && next.length > 1) speak(next.map((c) => c.label).join(' '));
+      return next;
+    });
   }
 
   function speakSentence() {

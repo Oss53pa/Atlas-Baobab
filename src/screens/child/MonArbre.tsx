@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Home } from 'lucide-react';
 import { activeChild, useAppState } from '../../lib/store.js';
-import { avatarGlyph, ART } from '../../lib/avatars.js';
+import { avatarGlyph, avatarImage, ART } from '../../lib/avatars.js';
 import { acquiredList } from '../../lib/trajectoires.js';
 import { speak } from '../../lib/tts.js';
 
@@ -58,6 +58,13 @@ export function MonArbre({ onExit }: { onExit: () => void }) {
         <defs>
           <linearGradient id="arbre-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={skyTop} /><stop offset="1" style={{ stopColor: 'var(--bg)' }} /></linearGradient>
           <radialGradient id="arbre-glow"><stop offset="0" stopColor="#F6DFA6" stopOpacity="0.9" /><stop offset="1" stopColor="#F6DFA6" stopOpacity="0" /></radialGradient>
+          <linearGradient id="arbre-trunk" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#CA9C6C" /><stop offset="0.5" stopColor="#B4855A" /><stop offset="1" stopColor="#9A6E48" /></linearGradient>
+          <radialGradient id="arbre-canopy" cx="38%" cy="28%" r="82%">
+            <stop offset="0" style={{ stopColor: 'color-mix(in srgb, var(--primary) 46%, #ffffff)' }} />
+            <stop offset="0.55" style={{ stopColor: 'color-mix(in srgb, var(--primary) 84%, #eef7ea)' }} />
+            <stop offset="1" style={{ stopColor: 'color-mix(in srgb, var(--primary) 94%, #33482c)' }} />
+          </radialGradient>
+          <radialGradient id="arbre-fruit-g"><stop offset="0" style={{ stopColor: 'color-mix(in srgb, var(--accent) 60%, #fff)' }} /><stop offset="1" style={{ stopColor: 'var(--accent)' }} /></radialGradient>
         </defs>
         <rect width="400" height="360" fill="url(#arbre-sky)" />
         <circle cx="330" cy="60" r="30" fill="#F2DFAE" opacity=".55" />
@@ -67,14 +74,27 @@ export function MonArbre({ onExit }: { onExit: () => void }) {
 
         <g transform={`translate(200 260) scale(${scale}) translate(-200 -260)`}>
           {/* Tronc baobab */}
-          <path d="M188 320 C182 250 176 220 188 190 C170 190 158 176 164 160 C142 164 128 148 136 132 C118 134 108 118 118 106 C134 86 186 78 216 92 C262 80 300 104 292 132 C314 138 316 164 294 174 C308 192 294 210 272 206 C280 240 274 272 270 320 Z" fill="#B98A5A" />
-          {/* Houppier */}
-          <circle cx="132" cy="120" r="52" style={{ fill: 'color-mix(in srgb, var(--primary) 74%, #fff)' }} />
-          <circle cx="205" cy="94" r="66" style={{ fill: 'color-mix(in srgb, var(--primary) 60%, #fff)' }} />
-          <circle cx="284" cy="120" r="54" style={{ fill: 'color-mix(in srgb, var(--primary) 74%, #fff)' }} />
-          <circle cx="205" cy="150" r="62" style={{ fill: 'color-mix(in srgb, var(--primary) 52%, #fff)' }} />
-          <circle cx="150" cy="176" r="42" style={{ fill: 'color-mix(in srgb, var(--primary) 66%, #fff)' }} />
-          <circle cx="260" cy="176" r="42" style={{ fill: 'color-mix(in srgb, var(--primary) 66%, #fff)' }} />
+          <path d="M188 320 C182 250 176 220 188 190 C170 190 158 176 164 160 C142 164 128 148 136 132 C118 134 108 118 118 106 C134 86 186 78 216 92 C262 80 300 104 292 132 C314 138 316 164 294 174 C308 192 294 210 272 206 C280 240 274 272 270 320 Z" fill="url(#arbre-trunk)" />
+          {/* Houppier — profondeur : ombres arrière, masse en dégradé, reflets */}
+          <g>
+            <circle cx="152" cy="128" r="52" style={{ fill: 'color-mix(in srgb, var(--primary) 94%, #2c3d26)' }} opacity="0.5" />
+            <circle cx="286" cy="128" r="54" style={{ fill: 'color-mix(in srgb, var(--primary) 94%, #2c3d26)' }} opacity="0.5" />
+            <circle cx="207" cy="160" r="62" style={{ fill: 'color-mix(in srgb, var(--primary) 94%, #2c3d26)' }} opacity="0.45" />
+          </g>
+          <circle cx="205" cy="94" r="66" fill="url(#arbre-canopy)" />
+          <circle cx="132" cy="120" r="52" fill="url(#arbre-canopy)" />
+          <circle cx="284" cy="120" r="54" fill="url(#arbre-canopy)" />
+          <circle cx="205" cy="150" r="62" fill="url(#arbre-canopy)" />
+          <circle cx="150" cy="176" r="42" fill="url(#arbre-canopy)" />
+          <circle cx="260" cy="176" r="42" fill="url(#arbre-canopy)" />
+          {/* creux d'ombre sous la canopée (là où naît le tronc) */}
+          <ellipse cx="205" cy="186" rx="66" ry="20" style={{ fill: 'color-mix(in srgb, var(--primary) 94%, #2c3d26)' }} opacity="0.25" />
+          {/* reflets clairs, haut-gauche */}
+          <g style={{ fill: 'color-mix(in srgb, var(--primary) 34%, #ffffff)' }}>
+            <circle cx="184" cy="72" r="24" opacity="0.7" />
+            <circle cx="118" cy="104" r="15" opacity="0.6" />
+            <circle cx="272" cy="102" r="13" opacity="0.55" />
+          </g>
           {/* Feuilles (assiduité, purement décoratif) */}
           <g fill="#EDF6EA">
             {Array.from({ length: leaves }, (_, i) => {
@@ -92,17 +112,23 @@ export function MonArbre({ onExit }: { onExit: () => void }) {
               <g key={comp.activity.id} className="arbre-fruit" onClick={() => tapFruit(i, comp)} role="button" style={{ cursor: 'pointer' }}>
                 {on && <circle cx={s.x} cy={s.y} r="26" fill="url(#arbre-glow)" />}
                 <circle cx={s.x} cy={s.y} r="18" fill="transparent" />
-                <circle cx={s.x} cy={s.y} r={on ? 9 : 7} style={{ fill: 'var(--accent)' }} />
-                <path d={`M${s.x} ${s.y - 8} q3 -6 9 -7`} stroke="#B98A5A" strokeWidth="2.4" fill="none" strokeLinecap="round" />
+                <ellipse cx={s.x} cy={s.y + 2} rx={on ? 9 : 7} ry={on ? 8 : 6.4} fill="#000" opacity="0.12" />
+                <circle cx={s.x} cy={s.y} r={on ? 9 : 7} fill="url(#arbre-fruit-g)" />
+                <circle cx={s.x - 2.4} cy={s.y - 2.6} r={on ? 2.6 : 2} fill="#fff" opacity="0.75" />
+                <path d={`M${s.x} ${s.y - 8} q3 -6 9 -7`} stroke="#7a5a3a" strokeWidth="2.4" fill="none" strokeLinecap="round" />
               </g>
             );
           })}
         </g>
 
         {/* Avatar au pied de l'arbre */}
-        <text x="300" y="300" fontSize="42" textAnchor="middle" className="arbre-av" onClick={() => speak('On regarde ton arbre, ensemble.')} style={{ cursor: 'pointer' }}>
-          {avatarGlyph(child.avatar_key, 4)}
-        </text>
+        {avatarImage(child.avatar_key) ? (
+          <image href={avatarImage(child.avatar_key)!} x="272" y="264" width="56" height="56" className="arbre-av" onClick={() => speak('On regarde ton arbre, ensemble.')} style={{ cursor: 'pointer' }} />
+        ) : (
+          <text x="300" y="300" fontSize="42" textAnchor="middle" className="arbre-av" onClick={() => speak('On regarde ton arbre, ensemble.')} style={{ cursor: 'pointer' }}>
+            {avatarGlyph(child.avatar_key, 4)}
+          </text>
+        )}
       </svg>
 
       {n === 0 && (

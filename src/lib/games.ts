@@ -24,6 +24,11 @@ export const GAMES: GameDef[] = [
   { code: 'combien', title: 'Combien ?', picto: '🔢', domains: GAME_DOMAINS.combien, available: true },
   { code: 'chemin', title: 'Le Chemin', picto: '✏️', domains: GAME_DOMAINS.chemin, available: true },
   { code: 'regarde', title: 'Regarde !', picto: '👀', domains: GAME_DOMAINS.regarde, available: true },
+  { code: 'association', title: 'Association apaisée', picto: '🍃', domains: GAME_DOMAINS.association, available: true },
+  { code: 'sequenceur', title: 'Le Séquenceur', picto: '🔢', domains: GAME_DOMAINS.sequenceur, available: true },
+  { code: 'puzzle', title: 'Puzzle calme', picto: '🧩', domains: GAME_DOMAINS.puzzle, available: true },
+  { code: 'emotions', title: 'Les émotions', picto: '😌', domains: GAME_DOMAINS.emotions, available: true },
+  { code: 'chasse', title: 'Chasse à l’objet', picto: '🔍', domains: GAME_DOMAINS.chasse, available: true },
 ];
 
 export function gameByCode(code: string): GameDef | undefined {

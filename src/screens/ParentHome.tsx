@@ -4,7 +4,7 @@ import {
   Star, Check, HelpCircle, ChevronRight, Sprout, HandHeart, Clock,
 } from 'lucide-react';
 import { suggestedFiches } from '../lib/togetherPlay.js';
-import { activeChild, growthPoints, acquiredCompetences, tensionToday, twinProfile, useAppState } from '../lib/store.js';
+import { activeChild, growthPoints, acquiredCompetences, childPauseCount7d, tensionToday, twinProfile, useAppState } from '../lib/store.js';
 import { ageYears, relativeDay, formatTime, dayLabelFull } from '../lib/format.js';
 import { KIND_GLYPH, KIND_TINT, WEATHER_GLYPH, WEATHER_TINT, GlyphNote, GlyphCloud } from '../components/glyphs.js';
 import { WEATHER, kindLabel, caregiverTint } from '../components/journalKit.js';
@@ -51,6 +51,7 @@ export function ParentHome({ go }: { go: (v: View) => void }) {
   const profile = useMemo(() => (child ? twinProfile(child.id, state) : null), [child, state]);
 
   const obs = useMemo(() => (child ? state.observations.filter((o) => o.child_id === child.id) : []), [state.observations, child?.id]);
+  const pauseCount = useMemo(() => (child ? childPauseCount7d(child.id, state) : 0), [child, state]);
   const playSuggestions = useMemo(() => (child ? suggestedFiches(child.id, state) : []), [child, state]);
 
   const week = useMemo(() => {
@@ -215,6 +216,17 @@ export function ParentHome({ go }: { go: (v: View) => void }) {
             <button className="btn btn-accent btn-block" style={{ marginTop: 12 }} onClick={() => go('reagir')}>
               <Compass size={16} /> Un comportement vous dépasse ? On vous guide
             </button>
+
+            {/* Alerte douce, non alarmiste (CDC Kessy §6.7) : pauses détresse répétées cette semaine. */}
+            {pauseCount >= 3 && (
+              <div className="mini-card" style={{ marginTop: 10 }}>
+                <span style={{ fontSize: 18 }}>🫧</span>
+                <span>
+                  {name} a utilisé la pause « une pause » {pauseCount} fois cette semaine.
+                  Ce n’est pas un diagnostic — juste un repère. <button className="home-link" style={{ display: 'inline', padding: 0 }} onClick={() => go('coach')}>Voir le Coach du jour</button>
+                </span>
+              </div>
+            )}
           </div>
 
           {/* SEMAINE = météo */}

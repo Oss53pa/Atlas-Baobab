@@ -141,11 +141,11 @@ export function Landing({ onEnter, onLogin, onScreening }: { onEnter: () => void
           <h2 className="lp-h2">Rien n’est laissé de côté.</h2>
           <p className="lp-lead2">Là où d’autres traitent un symptôme, Atlas Baobab accompagne toute une vie.</p>
           <div className="steps">
-            <Step title="Dépister" text="Un point gratuit, sans compte, dès le premier doute." />
-            <Step title="Comprendre" text="Un portrait tout en douceur : forces et besoins." />
-            <Step title="Développer" text="Parler, jouer, apaiser, chaque jour un petit pas." />
-            <Step title="Orienter" text="École, forces, métier : un cap à discuter." />
-            <Step title="S’épanouir" text="Un carnet de fiertés jusqu’à l’autonomie." />
+            <Step icon="depister.webp" title="Dépister" text="Un point gratuit, sans compte, dès le premier doute." />
+            <Step icon="comprendre.webp" title="Comprendre" text="Un portrait tout en douceur : forces et besoins." />
+            <Step icon="developper.webp" title="Développer" text="Parler, jouer, apaiser, chaque jour un petit pas." />
+            <Step icon="orienter.webp" title="Orienter" text="École, forces, métier : un cap à discuter." />
+            <Step icon="epanouir.webp" title="S’épanouir" text="Un carnet de fiertés jusqu’à l’autonomie." />
           </div>
           <ArtImage name="hero-famille.webp" alt="Une famille réunie et sereine dans son salon" ratio="3 / 2" className="art-band" />
         </div>
@@ -362,7 +362,7 @@ function PhoneMock() {
           <div className="mini-gauge-val"><b>72</b><small>/100</small></div>
         </div>
         <div className="mini-card">
-          <span className="pm-dot" />
+          <img className="pm-bibo" src="/avatars/bibo.webp" alt="" />
           <span><b>Bibo</b> a remarqué que les crises arrivent souvent en fin de journée.</span>
         </div>
         <div className="pm-chips">
@@ -384,8 +384,13 @@ function Pain({ emoji, title, text }: { emoji: string; title: string; text: stri
   return <div className="soft-card"><div className="ic">{emoji}</div><h3>{title}</h3><p>{text}</p></div>;
 }
 
-function Step({ title, text }: { title: string; text: string }) {
-  return <div className="step"><span className="n" /><div><h4>{title}</h4><p>{text}</p></div></div>;
+function Step({ title, text, icon }: { title: string; text: string; icon?: string }) {
+  return (
+    <div className="step">
+      {icon ? <img className="step-ic" src={`/art/steps/${icon}`} alt="" loading="lazy" decoding="async" /> : <span className="n" />}
+      <div><h4>{title}</h4><p>{text}</p></div>
+    </div>
+  );
 }
 
 function Feature({ glyph, sparks, bg, chip, title, text, bullets, rev, art }: { glyph: string; sparks: string[]; bg: string; chip: string; title: string; text: string; bullets: string[]; rev?: boolean; art?: string }) {
