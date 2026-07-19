@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { Home } from 'lucide-react';
-import { activeChild, useAppState } from '../../lib/store.js';
+import { activeChild, actions, gameLevelFor, useAppState } from '../../lib/store.js';
+import { playChildSound, haptic } from '../../lib/childAudio.js';
 import { childPaliers, childRegistre, registreCopy, palierStartLevel, GAME_DOMAINS, type GameDomain } from '../../lib/paliers.js';
 import { pickGamesForChild } from '../../lib/games.js';
 import { speak } from '../../lib/tts.js';
@@ -23,6 +24,9 @@ import type { GameProps } from './games/gameKit.js';
  * choisis par CORTEX selon le positionnement par domaine. Aucun palier ni niveau
  * n'est montré à l'enfant. Le jeu lancé démarre à une difficulté adaptée au palier.
  */
+// Teintes ludiques par carte (les jeux ont droit à la couleur, moins strict que l'UI).
+const GAME_TINTS = ['#7a9e7e', '#d99c3f', '#c46a5a', '#6e9fb3', '#9b8fb0'];
+
 const GAME_COMPONENTS: Record<string, (p: GameProps) => JSX.Element> = {
   memory_visual: GameMemory,
   suite: GameSuite,
@@ -58,6 +62,15 @@ export function JouerHub({ onExit, onBulle }: { onExit: () => void; onBulle?: ()
   const child = activeChild(state);
   const [playing, setPlaying] = useState<string | null>(null);
 
+  // §6.1 : au retour sur la natte (fin de jeu), Bibo annonce un passage de niveau.
+  useEffect(() => {
+    if (playing || !state.lastLevelUp) return;
+    playChildSound('victory');
+    if (child) haptic(20);
+    speak('Bravo ! Tu es prêt pour plus difficile !');
+    actions.clearLevelUp();
+  }, [playing, state.lastLevelUp]);
+
   if (!child) return null;
   const paliers = childPaliers(child.id, state);
   const registre = childRegistre(child.id, state);
@@ -67,21 +80,29 @@ export function JouerHub({ onExit, onBulle }: { onExit: () => void; onBulle?: ()
     const Comp = GAME_COMPONENTS[playing];
     if (Comp) {
       const dom = GAME_MAIN_DOMAIN[playing] ?? 'attention';
-      return <Comp startLevel={palierStartLevel(paliers[dom])} onExit={() => setPlaying(null)} onBulle={onBulle} />;
+      // Difficulté adaptative (§6.1) : palier de base + niveau N1/N2/N3 de l'activité.
+      const startLevel = palierStartLevel(paliers[dom]) + (gameLevelFor(child.id, playing) - 1);
+      return <Comp startLevel={startLevel} onExit={() => setPlaying(null)} onBulle={onBulle} />;
     }
   }
 
   return (
     <div className="cs-natte" data-theme={child.active_theme}>
       <button className="cs-natte-home" onClick={onExit} aria-label="Retour au monde"><Home size={26} /></button>
-      <h2 className="cs-natte-title">{registreCopy(registre).play}</h2>
-      <div className="cs-natte-grid" data-n={games.length}>
-        {games.map((g) => (
-          <button key={g.code} className="cs-natte-card" onClick={() => { speak(g.title); setPlaying(g.code); }}>
-            <span className="cs-natte-pic">{g.picto}</span>
-            <span className="cs-natte-name">{g.title}</span>
-          </button>
-        ))}
+      <div className="cs-natte-hero">
+        <img className="cs-natte-bibo bibo-alive" src="/avatars/bibo.webp" alt="" />
+        <h2 className="cs-natte-title">{registreCopy(registre).play}</h2>
+        <p className="cs-natte-sub">Choisis un jeu, on y va ensemble.</p>
+      </div>
+      <div className="cs-natte-mat">
+        <div className="cs-natte-grid" data-n={games.length}>
+          {games.map((g, i) => (
+            <button key={g.code} className="cs-natte-card" style={{ '--gi': GAME_TINTS[i % GAME_TINTS.length] } as CSSProperties} onClick={() => { speak(g.title); setPlaying(g.code); }}>
+              <span className="cs-natte-pic">{g.picto}</span>
+              <span className="cs-natte-name">{g.title}</span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

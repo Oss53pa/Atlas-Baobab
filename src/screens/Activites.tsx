@@ -5,7 +5,8 @@ import {
   ArrowLeft, Check, X, Plus,
   MessagesSquare, PersonStanding, Utensils, Users, Puzzle, Hand,
 } from 'lucide-react';
-import { activeChild, actions, acquiredCompetences, growthPoints, useAppState } from '../lib/store.js';
+import { activeChild, actions, acquiredCompetences, allGameProgress, growthPoints, useAppState } from '../lib/store.js';
+import { gameByCode } from '../lib/games.js';
 import { relativeDay, formatDate } from '../lib/format.js';
 import { avatarDisplayName, avatarGlyph, computeGrowthStage } from '../lib/avatars.js';
 import {
@@ -28,7 +29,7 @@ function DomainIcon({ name, size = 20 }: { name: string; size?: number }) {
 export function Activites({ go }: { go: (v: View) => void }) {
   const state = useAppState();
   const child = activeChild(state);
-  const [tab, setTab] = useState<'acquis' | 'catalogue'>('acquis');
+  const [tab, setTab] = useState<'acquis' | 'catalogue' | 'jeux'>('acquis');
   const [rating, setRating] = useState<Activity | null>(null);
 
   const byActivity = useMemo(() => {
@@ -64,9 +65,10 @@ export function Activites({ go }: { go: (v: View) => void }) {
       <div className="acq-tabs">
         <button className={`acq-tab ${tab === 'acquis' ? 'on' : ''}`} onClick={() => setTab('acquis')}>Les acquis</button>
         <button className={`acq-tab ${tab === 'catalogue' ? 'on' : ''}`} onClick={() => setTab('catalogue')}>Noter une activité</button>
+        <button className={`acq-tab ${tab === 'jeux' ? 'on' : ''}`} onClick={() => setTab('jeux')}>Progression des jeux</button>
       </div>
 
-      {tab === 'acquis' ? (
+      {tab !== 'jeux' && (tab === 'acquis' ? (
         totalSessions === 0 ? (
           <div className="card jl-empty">
             <div className="big">🌱</div>
@@ -152,9 +154,45 @@ export function Activites({ go }: { go: (v: View) => void }) {
             </div>
           </div>
         ))
-      )}
+      ))}
+
+      {tab === 'jeux' && child && <GameProgressSection childId={child.id} />}
 
       {rating && <RateModal activity={rating} prev={currentLevel(rating.id)} logs={byActivity.get(rating.id) ?? []} onClose={() => setRating(null)} />}
+    </div>
+  );
+}
+
+/** Tableau de progression des jeux (CDC Mode Enfant v1.1 §6.1) : niveau N1/N2/N3,
+ * fruits gagnés et parties jouées par activité. Piloté par la couche gameProgress. */
+function GameProgressSection({ childId }: { childId: string }) {
+  const state = useAppState();
+  const rows = allGameProgress(childId, state);
+  if (rows.length === 0) {
+    return (
+      <div className="card jl-empty">
+        <div className="big">🎮</div>
+        <p style={{ marginTop: 10 }}>Aucun jeu joué pour l’instant.<br />La progression apparaîtra ici, activité par activité.</p>
+      </div>
+    );
+  }
+  return (
+    <div className="card jl-card">
+      {rows.map(({ code, p }) => {
+        const title = gameByCode(code)?.title ?? code;
+        return (
+          <div className="acq-cat-row" key={code}>
+            <div className="grow" style={{ minWidth: 0 }}>
+              <div className="acq-row-title">{title}</div>
+              <div className="acq-row-meta">🍎 {p.fruits} fruit{p.fruits > 1 ? 's' : ''} · {p.attempts} partie{p.attempts > 1 ? 's' : ''}{p.wins ? ` · ${p.wins} réussie${p.wins > 1 ? 's' : ''}` : ''}</div>
+            </div>
+            <div className="gp-level" title={`Niveau ${p.level} sur 3`}>
+              {[1, 2, 3].map((n) => <i key={n} className={n <= p.level ? 'on' : ''} />)}
+              <span className="gp-level-n">N{p.level}</span>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

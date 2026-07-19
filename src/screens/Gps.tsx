@@ -80,12 +80,12 @@ export function Gps({ go }: { go: (v: View) => void }) {
               {done < total ? (
                 <button className="btn btn-primary" onClick={() => franchir(cap)}><Check size={16} /> Marche franchie</button>
               ) : (
-                <span className="co-tried" style={{ margin: 0 }}><Sparkles size={15} /> Cap atteint — de beaux fruits sur son arbre.</span>
+                <span className="co-tried" style={{ margin: 0 }}><Sparkles size={15} /> Cap atteint — une feuille d’or sur son arbre.</span>
               )}
               <button className="btn" onClick={() => go('ensemble')}>Fiche à faire en vrai</button>
               <button className="btn" onClick={() => go('coach')}>Leçon liée</button>
             </div>
-            <p className="notice" style={{ marginTop: 12 }}>Chaque marche franchie devient un fruit d’or sur le baobab de {child.first_name} — il le voit, à sa façon.</p>
+            <p className="notice" style={{ marginTop: 12 }}>Chaque marche franchie devient une feuille d’or sur le baobab de {child.first_name} — il le voit, à sa façon.</p>
           </div>
         );
       })}

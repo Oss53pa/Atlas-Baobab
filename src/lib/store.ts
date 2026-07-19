@@ -26,6 +26,7 @@ import type {
   AppState,
   Child,
   GameSession,
+  GameProgress,
   Observation,
   ScreeningResult,
   TogetherLog,
@@ -64,6 +65,16 @@ function freshState(): AppState {
     aacBoards: seedBoards(seed.child.id),
     aacUsage: seedAacUsage(seed.child.id),
     gameSessions: seedGameSessions(seed.child.id),
+    // Progression de démo, cohérente avec les 14 séances seedées (14 fruits au total).
+    gameProgress: {
+      [`${seed.child.id}:memory_visual`]: { level: 2, attempts: 3, wins: 2, streak: 0, lossStreak: 0, fruits: 3 },
+      [`${seed.child.id}:suite`]: { level: 1, attempts: 3, wins: 1, streak: 1, lossStreak: 0, fruits: 3 },
+      [`${seed.child.id}:combien`]: { level: 2, attempts: 2, wins: 2, streak: 2, lossStreak: 0, fruits: 2 },
+      [`${seed.child.id}:regarde`]: { level: 1, attempts: 2, wins: 2, streak: 2, lossStreak: 0, fruits: 2 },
+      [`${seed.child.id}:tambour`]: { level: 1, attempts: 2, wins: 1, streak: 0, lossStreak: 0, fruits: 2 },
+      [`${seed.child.id}:maison`]: { level: 1, attempts: 1, wins: 1, streak: 1, lossStreak: 0, fruits: 1 },
+      [`${seed.child.id}:chemin`]: { level: 1, attempts: 1, wins: 0, streak: 0, lossStreak: 0, fruits: 1 },
+    },
     activityLogs: seedActivityLogs(seed.child.id, deviceId),
     togetherLogs: [],
     coachActions: [],
@@ -114,6 +125,7 @@ function normalize(s: AppState): AppState {
     s.forumThreads = s.forumThreads ?? f.threads;
     s.forumPosts = s.forumPosts ?? f.posts;
   }
+  if (!s.gameProgress) s.gameProgress = {};
   // Backfill des séances d'activités. Sur un état de démonstration (seeded), on
   // ré-amorce si vide — pour que la vue Acquis ait de la matière. Jamais sur un
   // état réel (seeded = false) ni s'il contient déjà des séances.
@@ -224,6 +236,28 @@ export function acquiredCompetences(childId: string, s: AppState = state): numbe
  * acquis fait donc grandir le Baobab de l'enfant (motivation visible, CDC C02). */
 export function growthPoints(childId: string, s: AppState = state): number {
   return milestoneCount(childId, s) + acquiredCompetences(childId, s);
+}
+
+// ── Progression par activité (v1.1 §6.1) ───────────────────────────────────
+const DEFAULT_PROGRESS: GameProgress = { level: 1, attempts: 0, wins: 0, streak: 0, lossStreak: 0, fruits: 0 };
+
+/** Progression d'un enfant sur une activité (défaut = N1 vierge). */
+export function gameProgressFor(childId: string, code: string, s: AppState = state): GameProgress {
+  return s.gameProgress[`${childId}:${code}`] ?? DEFAULT_PROGRESS;
+}
+
+/** Niveau courant N1/N2/N3 d'une activité, pour la difficulté adaptative. */
+export function gameLevelFor(childId: string, code: string, s: AppState = state): 1 | 2 | 3 {
+  return gameProgressFor(childId, code, s).level;
+}
+
+/** Toutes les activités jouées par l'enfant, avec leur progression (tableau parent). */
+export function allGameProgress(childId: string, s: AppState = state): { code: string; p: GameProgress }[] {
+  const prefix = `${childId}:`;
+  return Object.entries(s.gameProgress)
+    .filter(([k]) => k.startsWith(prefix))
+    .map(([k, p]) => ({ code: k.slice(prefix.length), p }))
+    .sort((a, b) => b.p.attempts - a.p.attempts);
 }
 
 export function twinProfile(childId: string, s: AppState = state): TwinProfile {
@@ -405,10 +439,32 @@ export const actions = {
   addGameSession(session: Omit<GameSession, 'id' | 'child_id'>): void {
     const childId = state.activeChildId;
     if (!childId) return;
+    // Couche de progression v1.1 §6.1 : pilotée par la télémétrie, sans toucher aux jeux.
+    const key = `${childId}:${session.game_code}`;
+    const p = state.gameProgress[key] ?? { level: 1 as const, attempts: 0, wins: 0, streak: 0, lossStreak: 0, fruits: 0 };
+    const t = session.telemetry;
+    const total = t.hits + t.misses;
+    const rate = total ? t.hits / total : 0;
+    const np = { ...p, attempts: p.attempts + 1, fruits: p.fruits + 1 };
+    let leveledUp = false;
+    if (rate >= 0.8) {
+      np.wins += 1; np.streak += 1; np.lossStreak = 0;
+      if (np.streak >= 3 && np.level < 3) { np.level = (np.level + 1) as 1 | 2 | 3; np.streak = 0; leveledUp = true; }
+    } else if (rate < 0.6) {
+      np.lossStreak += 1; np.streak = 0;
+      if (np.lossStreak >= 2 && np.level > 1) { np.level = (np.level - 1) as 1 | 2 | 3; np.lossStreak = 0; }
+    } else { np.streak = 0; np.lossStreak = 0; }
     set({
       ...state,
       gameSessions: [{ ...session, id: uid(), child_id: childId }, ...state.gameSessions],
+      gameProgress: { ...state.gameProgress, [key]: np },
+      lastLevelUp: leveledUp ? { code: session.game_code, level: np.level } : null,
     });
+  },
+
+  /** Efface l'annonce de level-up après lecture par l'UI (§6.1). */
+  clearLevelUp(): void {
+    if (state.lastLevelUp) set({ ...state, lastLevelUp: null });
   },
 
   logActivity(input: { activity_id: string; domain: string; level: number; note?: string }): void {
@@ -471,7 +527,7 @@ export const actions = {
   },
 
   /** GPS : franchir la marche courante (« now » → « done », la suivante devient
-   * « now »). Chaque marche franchie est un fruit d'or sur le baobab (CX-01 §8). */
+   * « now »). Chaque marche franchie est une feuille d'or sur le baobab (CX-01 §8). */
   gpsAdvance(capId: string): void {
     set({
       ...state,

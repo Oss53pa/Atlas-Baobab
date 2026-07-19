@@ -6,6 +6,7 @@
  */
 
 import { childPaliers, dominantPalier, GAME_DOMAINS, type GameDomain } from './paliers.js';
+import { cdcAgeBand, type AgeBand } from './childProfileConfig.js';
 import type { AppState } from './types.js';
 
 export interface GameDef {
@@ -14,21 +15,28 @@ export interface GameDef {
   picto: string;
   domains: GameDomain[];
   available: boolean;
+  /** Tranches d'âge où le jeu est proposé (CDC Mode Enfant v1.1 §6.4).
+   * ⚠️ Intérim : seuls les gates EXPLICITES du tableau §6.3 sont posés
+   * (Émotions : pas avant 5-7). Le reste ouvert à toutes les bandes en
+   * attendant la confirmation du mapping code↔activité (voir note P5). */
+  ageBands: AgeBand[];
 }
 
+const ALL_BANDS: AgeBand[] = ['2-4', '5-7', '8-12'];
+
 export const GAMES: GameDef[] = [
-  { code: 'memory_visual', title: 'Les Paires', picto: '🃏', domains: GAME_DOMAINS.memory_visual, available: true },
-  { code: 'suite', title: 'La Suite', picto: '🔁', domains: GAME_DOMAINS.suite, available: true },
-  { code: 'tambour', title: 'Le Tambour', picto: '🥁', domains: GAME_DOMAINS.tambour, available: true },
-  { code: 'maison', title: 'Chacun sa maison', picto: '🏠', domains: GAME_DOMAINS.maison, available: true },
-  { code: 'combien', title: 'Combien ?', picto: '🔢', domains: GAME_DOMAINS.combien, available: true },
-  { code: 'chemin', title: 'Le Chemin', picto: '✏️', domains: GAME_DOMAINS.chemin, available: true },
-  { code: 'regarde', title: 'Regarde !', picto: '👀', domains: GAME_DOMAINS.regarde, available: true },
-  { code: 'association', title: 'Association apaisée', picto: '🍃', domains: GAME_DOMAINS.association, available: true },
-  { code: 'sequenceur', title: 'Le Séquenceur', picto: '🔢', domains: GAME_DOMAINS.sequenceur, available: true },
-  { code: 'puzzle', title: 'Puzzle calme', picto: '🧩', domains: GAME_DOMAINS.puzzle, available: true },
-  { code: 'emotions', title: 'Les émotions', picto: '😌', domains: GAME_DOMAINS.emotions, available: true },
-  { code: 'chasse', title: 'Chasse à l’objet', picto: '🔍', domains: GAME_DOMAINS.chasse, available: true },
+  { code: 'memory_visual', title: 'Les Paires', picto: '🃏', domains: GAME_DOMAINS.memory_visual, available: true, ageBands: ALL_BANDS },
+  { code: 'suite', title: 'La Suite', picto: '🔁', domains: GAME_DOMAINS.suite, available: true, ageBands: ALL_BANDS },
+  { code: 'tambour', title: 'Le Tambour', picto: '🥁', domains: GAME_DOMAINS.tambour, available: true, ageBands: ALL_BANDS },
+  { code: 'maison', title: 'Chacun sa maison', picto: '🏠', domains: GAME_DOMAINS.maison, available: true, ageBands: ALL_BANDS },
+  { code: 'combien', title: 'Combien ?', picto: '🔢', domains: GAME_DOMAINS.combien, available: true, ageBands: ALL_BANDS },
+  { code: 'chemin', title: 'Le Chemin', picto: '✏️', domains: GAME_DOMAINS.chemin, available: true, ageBands: ALL_BANDS },
+  { code: 'regarde', title: 'Regarde !', picto: '👀', domains: GAME_DOMAINS.regarde, available: true, ageBands: ALL_BANDS },
+  { code: 'association', title: 'Association apaisée', picto: '🍃', domains: GAME_DOMAINS.association, available: true, ageBands: ALL_BANDS },
+  { code: 'sequenceur', title: 'Le Séquenceur', picto: '🔢', domains: GAME_DOMAINS.sequenceur, available: true, ageBands: ALL_BANDS },
+  { code: 'puzzle', title: 'Puzzle calme', picto: '🧩', domains: GAME_DOMAINS.puzzle, available: true, ageBands: ALL_BANDS },
+  { code: 'emotions', title: 'Les émotions', picto: '😌', domains: GAME_DOMAINS.emotions, available: true, ageBands: ['5-7', '8-12'] },
+  { code: 'chasse', title: 'Chasse à l’objet', picto: '🔍', domains: GAME_DOMAINS.chasse, available: true, ageBands: ['2-4', '5-7'] },
 ];
 
 export function gameByCode(code: string): GameDef | undefined {
@@ -41,7 +49,10 @@ export function gameByCode(code: string): GameDef | undefined {
  * le même domaine en tête si on peut l'éviter).
  */
 export function pickGamesForChild(childId: string, state: AppState): GameDef[] {
-  const available = GAMES.filter((g) => g.available);
+  const child = state.children.find((c) => c.id === childId);
+  const band = child ? cdcAgeBand(child.birth_date) : '5-7';
+  // §6.4 : ne proposer que les activités de la tranche d'âge de l'enfant.
+  const available = GAMES.filter((g) => g.available && g.ageBands.includes(band));
   const nCards = dominantPalier(childId, state) === 'P1' ? 2 : 3;
   const paliers = childPaliers(childId, state);
   // Ordre : domaine le plus consolidé d'abord (repère stable, sans hasard).

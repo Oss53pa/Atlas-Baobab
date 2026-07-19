@@ -40,6 +40,8 @@ export function avatarDef(key: AvatarKey): AvatarDef {
  */
 export const AVATAR_IMG: Partial<Record<AvatarKey, string>> = {
   pousse: '/avatars/bibo.webp',
+  luciole: '/avatars/lila.webp',
+  cameleon: '/avatars/kama.webp',
   tisserin: '/avatars/titi.webp',
   tortue: '/avatars/momo.webp',
   cactus: '/avatars/cactus.webp',

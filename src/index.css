@@ -397,6 +397,16 @@ p { margin: 0; }
 .cat-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 12px; }
 .cat-tabs button { white-space: nowrap; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font-family: var(--font-child); font-weight: 700; font-size: 13px; }
 .cat-tabs button.on { background: var(--primary); color: var(--primary-ink); border-color: transparent; }
+/* CAA v1.1 : fond neutre stable (§5.4.6), boutons icône maison, Aide fixe, gomme */
+.child-shell.cs-caa { background: var(--surface); }
+.cs-iconbtn { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text); display: grid; place-items: center; flex: 0 0 auto; }
+.caa-aide { display: inline-flex; align-items: center; gap: 7px; padding: 8px 13px; border-radius: 999px; border: 2px solid color-mix(in srgb, var(--radar-red) 42%, var(--border)); background: color-mix(in srgb, var(--radar-red) 12%, var(--surface)); color: color-mix(in srgb, var(--radar-red) 78%, var(--text)); font-family: var(--font-child); font-weight: 800; font-size: 13px; }
+.caa-aide .p { font-size: 20px; line-height: 1; }
+.caa-hand { color: var(--text-muted); opacity: .5; display: inline-flex; }
+.caa-erase { position: relative; }
+.caa-erase-ring { position: absolute; inset: -2px; width: calc(100% + 4px); height: calc(100% + 4px); transform: rotate(-90deg); pointer-events: none; }
+.caa-erase-ring circle { fill: none; stroke: var(--primary); stroke-width: 3; stroke-dasharray: 126; stroke-dashoffset: 126; animation: caa-erase-fill 1s linear forwards; }
+@keyframes caa-erase-fill { to { stroke-dashoffset: 0; } }
 
 /* ── Enfant : coquille ─────────────────────────────────────────────────── */
 .child-shell { min-height: 100%; display: flex; flex-direction: column; font-family: var(--font-child);
@@ -420,6 +430,20 @@ p { margin: 0; }
 .breath { width: 224px; height: 224px; border-radius: 50%; margin: 24px auto; background: radial-gradient(circle, color-mix(in srgb, var(--primary) 32%, var(--surface)), color-mix(in srgb, var(--primary) 8%, var(--surface)) 68%, transparent); display: grid; place-items: center; font-size: 76px; font-family: var(--font-child); font-weight: 800; color: var(--text); box-shadow: 0 0 60px -10px color-mix(in srgb, var(--primary) 30%, transparent); animation: breathe 8s ease-in-out infinite; }
 .breath-av { width: 132px; height: 132px; object-fit: contain; }
 @keyframes breathe { 0%, 100% { transform: scale(0.7); } 50% { transform: scale(1); } }
+/* Coin calme v1.1 (§5.2) : respiration sans texte, fond bleu-lavande doux */
+.cs-calme { background: linear-gradient(180deg, #EEF0F8, #E7EAF4) !important; }
+.cc-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 20px; }
+.cc-halo { position: relative; width: min(78vw, 320px); aspect-ratio: 1; display: grid; place-items: center; }
+.cc-ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.cc-ring-bg { fill: none; stroke: rgba(157,187,198,.25); stroke-width: 6; }
+.cc-ring-fg { fill: none; stroke: #9DBBC6; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+.cc-breath { width: 76%; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; font-size: 68px; transition: transform 4s ease-in-out, opacity .6s;
+  background: radial-gradient(circle, #FFFFFF, color-mix(in srgb, #C6D6EF 55%, #fff) 68%, transparent);
+  box-shadow: 0 0 70px -8px rgba(157,187,198,.5); }
+.cc-bibo { width: 58%; height: 58%; object-fit: contain; }
+.cc-cue { font-family: var(--font-child); font-weight: 800; font-size: 20px; color: #5B6B8A; letter-spacing: .5px; }
+.cc-halo[data-ending="true"] .cc-breath { opacity: .45; }
+@media (prefers-reduced-motion: reduce) { .cc-breath { transition-duration: .3s !important; } }
 
 .reveal { animation: fade .3s ease both; }
 @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -474,6 +498,15 @@ input.field::placeholder, textarea.field::placeholder { color: color-mix(in srgb
 .mini-gauge-val small { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
 .mini-card { display: flex; align-items: flex-start; gap: 9px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 11px 13px; margin-top: 4px; font-size: 12px; line-height: 1.45; box-shadow: 0 8px 20px -14px rgba(74,69,62,.3); }
 .pm-bibo { width: 30px; height: 30px; object-fit: contain; flex: 0 0 auto; margin: -2px -2px 0 -2px; }
+/* Bibo vivant (CDC v1.1 §3.3) : respiration + balancement indépendants du décor.
+ * scale/rotate (props séparées) se composent, contrairement à transform. */
+@keyframes bibo-breathe { 0%, 100% { scale: 1; } 50% { scale: 1.035; } }
+@keyframes bibo-sway { 0%, 100% { rotate: -1.5deg; } 50% { rotate: 1.5deg; } }
+.bibo-alive { transform-origin: 50% 92%; animation: bibo-breathe 3.2s ease-in-out infinite, bibo-sway 5s ease-in-out infinite; }
+/* Bibo posé sur la scène centrale de l'accueil (calque au-dessus du décor) */
+.cs-home-bibo { position: absolute; left: 50%; top: 56%; transform: translateX(-50%); width: clamp(74px, 16vw, 116px); border: none; background: none; padding: 0; z-index: 3; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.cs-home-bibo img { width: 100%; height: auto; display: block; filter: drop-shadow(0 10px 12px rgba(70,60,45,.28)); }
+@media (prefers-reduced-motion: reduce) { .bibo-alive { animation: none; } }
 .pm-chips { display: flex; justify-content: space-between; gap: 8px; margin-top: 12px; }
 .pm-chip {
   flex: 1; aspect-ratio: 1; border-radius: 14px; display: grid; place-items: center; color: var(--tint);
@@ -674,6 +707,12 @@ input.field::placeholder, textarea.field::placeholder { color: color-mix(in srgb
 
 /* ═══ Réglages ════════════════════════════════════════════════════════════ */
 .set-grid { display: grid; grid-template-columns: 1fr; gap: 16px; align-items: start; }
+.set-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; align-items: start; }
+/* Tableau de progression des jeux (v1.1 §6.1) */
+.gp-level { display: inline-flex; align-items: center; gap: 5px; flex: 0 0 auto; }
+.gp-level i { width: 9px; height: 9px; border-radius: 50%; background: color-mix(in srgb, var(--primary) 16%, var(--surface)); border: 1px solid var(--border); }
+.gp-level i.on { background: var(--accent); border-color: transparent; }
+.gp-level-n { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--text-muted); margin-left: 4px; }
 .set-kid { display: flex; align-items: center; gap: 14px; }
 .set-kid-av { width: 58px; height: 58px; border-radius: 18px; background: var(--surface-2); display: grid; place-items: center; font-size: 30px; flex: 0 0 auto; }
 .set-addkid { width: 100%; margin-top: 12px; border: 1.5px dashed var(--border); border-radius: 14px; padding: 12px; text-align: center; font-size: 13px; color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
@@ -744,7 +783,11 @@ input.field::placeholder, textarea.field::placeholder { color: color-mix(in srgb
 .cs-talk:active { transform: translateX(-50%) translateY(3px); box-shadow: 0 3px 0 color-mix(in srgb, var(--primary) 68%, #000), 0 5px 14px rgba(62, 58, 53, .18); }
 .cs-talk-pic { font-size: clamp(30px, 6.5vh, 46px); }
 .cs-talk-name { font-size: clamp(24px, 4.4vh, 32px); font-weight: 900; letter-spacing: .5px; }
-.cs-parent { position: fixed; top: 12px; right: 12px; width: 56px; height: 56px; border-radius: 50%; border: none; display: grid; place-items: center; z-index: 40; background: color-mix(in srgb, var(--primary) 38%, var(--surface)); color: color-mix(in srgb, var(--primary-ink, #2e2a24) 55%, transparent); -webkit-tap-highlight-color: transparent; touch-action: none; }
+.cs-parent { position: fixed; top: 12px; right: 76px; width: 56px; height: 56px; border-radius: 50%; border: none; display: grid; place-items: center; z-index: 40; background: color-mix(in srgb, var(--primary) 38%, var(--surface)); color: color-mix(in srgb, var(--primary-ink, #2e2a24) 55%, transparent); -webkit-tap-highlight-color: transparent; touch-action: none; }
+/* Bouton sensoriel (L5) : coin supérieur droit, 56 px, 3 états */
+.cs-sensory { position: fixed; top: 12px; right: 12px; width: 56px; height: 56px; border-radius: 50%; border: none; display: grid; place-items: center; z-index: 41; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); color: var(--primary); -webkit-tap-highlight-color: transparent; transition: transform .12s; }
+.cs-sensory:active { transform: scale(.92); }
+.cs-sensory[data-mode="silence"] { color: var(--text-muted); }
 .cs-parent:active { transform: scale(.96); }
 /* Protocole « je ne suis pas bien » (CDC Kessy §6) : même place sur tous les écrans,
  * un tap, aucune confirmation. */
@@ -872,6 +915,11 @@ input.field::placeholder, textarea.field::placeholder { color: color-mix(in srgb
 .arbre-fruit:nth-child(3n) { animation-delay: 1.3s; }
 .arbre-fruit:nth-child(3n+1) { animation-delay: 2.6s; }
 @keyframes arbre-fruit-breathe { 0%, 100% { opacity: .92; } 50% { opacity: 1; } }
+/* §5.1.5 : un nouveau fruit descend en douceur ; Bibo se réjouit */
+.arbre-fruit-new { animation: arbre-fruit-drop 0.9s cubic-bezier(0.22, 0.9, 0.3, 1.2) both !important; transform-box: fill-box; transform-origin: center; }
+@keyframes arbre-fruit-drop { 0% { transform: translateY(-120px); opacity: 0; } 60% { opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
+.arbre-joy { animation: arbre-joy-bounce 0.5s ease-in-out 3 !important; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes arbre-joy-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 .arbre-av { transition: transform .3s; }
 .arbre-empty { position: absolute; left: 50%; bottom: 12vh; transform: translateX(-50%); max-width: 320px; text-align: center;
   background: color-mix(in srgb, var(--surface) 88%, transparent); border: 1px solid var(--border); border-radius: 18px; padding: 14px 18px;
@@ -891,26 +939,34 @@ input.field::placeholder, textarea.field::placeholder { color: color-mix(in srgb
 .arbre-wrap.static .arbre-medallion { animation: none; }
 
 /* La « natte » : choix de jeux (CDC Jeux §1) */
-.cs-natte { position: relative; min-height: 100vh; padding: 64px 22px 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px;
+.cs-natte { position: relative; min-height: 100vh; padding: 7vh 22px 6vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 28px;
   background:
     radial-gradient(90% 55% at 50% 0%, color-mix(in srgb, var(--primary) 15%, transparent), transparent 65%),
     radial-gradient(80% 55% at 100% 100%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 55%),
     radial-gradient(80% 55% at 0% 100%, color-mix(in srgb, var(--secondary, var(--primary)) 13%, transparent), transparent 55%),
     linear-gradient(180deg, var(--surface), var(--bg)); }
 .cs-natte-home { position: absolute; top: 18px; left: 18px; width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center;
-  color: var(--text); background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); }
-.cs-natte-title { font-family: var(--font-child, inherit); font-size: 26px; font-weight: 800; color: var(--text); text-align: center; }
-.cs-natte-grid { display: grid; gap: 18px; width: 100%; max-width: 520px; }
-.cs-natte-grid[data-n="1"] { grid-template-columns: 1fr; max-width: 300px; }
+  color: var(--text); background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); z-index: 2; }
+.cs-natte-hero { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.cs-natte-bibo { width: clamp(94px, 25vw, 132px); height: auto; object-fit: contain; filter: drop-shadow(0 10px 18px color-mix(in srgb, var(--primary) 30%, transparent)); animation: cs-fl 6s ease-in-out infinite; }
+.cs-natte-title { font-family: var(--font-child, inherit); font-size: clamp(28px, 6vw, 40px); font-weight: 900; color: var(--text); text-align: center; line-height: 1.1; }
+.cs-natte-sub { font-family: var(--font-child, inherit); font-size: 14.5px; font-weight: 700; color: var(--text-muted); text-align: center; margin-top: 2px; }
+.cs-natte-mat { width: 100%; max-width: 640px; padding: 24px 20px; border-radius: 32px;
+  background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--accent) 11%, var(--surface)) 0 7px, color-mix(in srgb, var(--accent) 5%, var(--surface)) 7px 14px);
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border)); box-shadow: var(--shadow); }
+.cs-natte-grid { display: grid; gap: 16px; width: 100%; }
+.cs-natte-grid[data-n="1"] { grid-template-columns: 1fr; max-width: 300px; margin: 0 auto; }
 .cs-natte-grid[data-n="2"] { grid-template-columns: repeat(2, 1fr); }
 .cs-natte-grid[data-n="3"] { grid-template-columns: repeat(3, 1fr); }
-.cs-natte-card { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 26px 14px; border-radius: 26px;
-  background: linear-gradient(180deg, var(--surface), color-mix(in srgb, var(--primary) 6%, var(--surface))); border: 1px solid var(--border); box-shadow: var(--shadow); transition: transform .13s, box-shadow .13s, border-color .13s; }
-.cs-natte-card:hover, .cs-natte-card:active { transform: translateY(-3px) scale(1.02); border-color: color-mix(in srgb, var(--primary) 45%, var(--border)); box-shadow: var(--shadow-lg); }
-.cs-natte-pic { font-size: clamp(40px, 11vw, 56px); line-height: 1; width: clamp(78px, 22vw, 104px); aspect-ratio: 1; display: grid; place-items: center; border-radius: 24px;
-  background: radial-gradient(120% 120% at 30% 20%, color-mix(in srgb, var(--primary) 20%, var(--surface)), color-mix(in srgb, var(--primary) 7%, var(--surface)));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 20%, transparent); }
-.cs-natte-name { font-family: var(--font-child, inherit); font-size: 17px; font-weight: 800; color: var(--text); text-align: center; }
+.cs-natte-card { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 24px 12px; border-radius: 24px;
+  background: linear-gradient(180deg, #fff, color-mix(in srgb, var(--gi, var(--primary)) 9%, #fff)); border: 1px solid color-mix(in srgb, var(--gi, var(--primary)) 30%, var(--border));
+  box-shadow: 0 12px 24px -14px color-mix(in srgb, var(--gi, var(--primary)) 45%, transparent), var(--shadow); transition: transform .13s, box-shadow .13s; }
+.cs-natte-card:hover, .cs-natte-card:active { transform: translateY(-4px) scale(1.03); box-shadow: 0 18px 34px -14px color-mix(in srgb, var(--gi, var(--primary)) 58%, transparent), var(--shadow-lg); }
+.cs-natte-pic { font-size: clamp(38px, 10vw, 52px); line-height: 1; width: clamp(74px, 20vw, 94px); aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%;
+  background: radial-gradient(120% 120% at 32% 22%, color-mix(in srgb, var(--gi, var(--primary)) 28%, #fff), color-mix(in srgb, var(--gi, var(--primary)) 11%, #fff));
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--gi, var(--primary)) 36%, transparent); }
+.cs-natte-name { font-family: var(--font-child, inherit); font-size: 16.5px; font-weight: 800; color: var(--text); text-align: center; }
+@media (prefers-reduced-motion: reduce) { .cs-natte-bibo { animation: none; } }
 
 /* §5 · Pré-signal du sablier : scintillement doux dans la dernière minute */
 .cs-hourglass.presignal { animation: cs-sand 1.1s ease-in-out infinite; }

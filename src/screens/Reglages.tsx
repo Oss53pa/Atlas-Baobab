@@ -11,6 +11,7 @@ import {
 } from '../lib/avatars.js';
 import { speak } from '../lib/tts.js';
 import { AvatarPic } from '../components/AvatarPic.js';
+import { Tabs } from '../components/Tabs.js';
 import { INTEREST_SUGGESTIONS, profileNeedsReview, SENSORY_PREF_LABEL } from '../lib/childProfile.js';
 import type { CommunicationLevel, SensoryPref, SupportLevel } from '../lib/types.js';
 
@@ -37,6 +38,7 @@ export function Reglages() {
   const [nameDraft, setNameDraft] = useState(child?.avatar_custom_name ?? '');
   const [addOpen, setAddOpen] = useState(false);
   const [sensitivityDraft, setSensitivityDraft] = useState('');
+  const [tab, setTab] = useState<'enfant' | 'profil' | 'entourage' | 'compte'>('enfant');
 
   const team = useMemo(() => {
     if (!child) return [];
@@ -51,9 +53,19 @@ export function Reglages() {
     <div className="reveal">
       <h2 style={{ fontSize: 24, margin: '2px 2px 16px' }}>Réglages</h2>
 
-      <div className="set-grid">
-        {/* ── Colonne gauche ────────────────────────────────────── */}
-        <div className="home-col">
+      <Tabs
+        tabs={[
+          { key: 'enfant', label: 'L’enfant' },
+          { key: 'profil', label: 'Son profil' },
+          { key: 'entourage', label: 'Entourage' },
+          { key: 'compte', label: 'Données & compte' },
+        ]}
+        active={tab}
+        onChange={setTab}
+      />
+
+      {tab === 'enfant' && (
+      <div className="set-cards">
           {/* Profil enfant */}
           <div className="card">
             <div className="section-title" style={{ marginTop: 0 }}>Profil de l’enfant</div>
@@ -146,7 +158,12 @@ export function Reglages() {
               <div className="set-sanct">« Je parle » (sa voix) et « Ma bulle » ne sont <b>jamais</b> comptés ni bloqués. Jamais.</div>
               <p className="muted" style={{ fontSize: 11.5, marginTop: 8 }}>Modification protégée par votre code PIN. Seuls les jeux sont concernés.</p>
             </div>
+          </>)}
+      </div>
+      )}
 
+      {tab === 'profil' && child && (
+      <div className="set-cards">
             {/* Profil fonctionnel (CDC Kessy §3) : non-diagnostique, reconfigure l'app en douceur. */}
             <div className="card">
               <div className="section-title" style={{ marginTop: 0 }}>Profil de {child.first_name}</div>
@@ -242,13 +259,12 @@ export function Reglages() {
                   onClick={() => actions.updateChild(child.id, { professional_sharing_enabled: !child.professional_sharing_enabled })} aria-label="Partage professionnel"><i /></button>
               </div>
             </div>
-          </>)}
-        </div>
+      </div>
+      )}
 
-        {/* ── Colonne droite ────────────────────────────────────── */}
-        <div className="home-col">
-          {/* Aidants */}
-          {child && (
+      {tab === 'entourage' && child && (
+      <div className="set-cards">
+            {/* Aidants */}
             <div className="card">
               <div className="section-title" style={{ marginTop: 0 }}>L’équipe autour de {child.first_name}</div>
               {team.length === 0 ? (
@@ -265,8 +281,11 @@ export function Reglages() {
               })}
               <button className="set-invite"><UserPlus size={15} /> Inviter — lien + code à 6 chiffres, expire en 72 h</button>
             </div>
-          )}
+      </div>
+      )}
 
+      {tab === 'compte' && (
+      <div className="set-cards">
           {/* Compte & données */}
           <div className="card">
             <div className="section-title" style={{ marginTop: 0 }}>Vos données · votre contrôle</div>
@@ -304,8 +323,8 @@ export function Reglages() {
           <button className="btn btn-block" style={{ color: 'var(--radar-red)' }} onClick={() => { if (confirm('Réinitialiser les données de démonstration ?')) actions.resetAll(); }}>
             <RotateCcw size={16} /> Réinitialiser la démo
           </button>
-        </div>
       </div>
+      )}
     </div>
   );
 }

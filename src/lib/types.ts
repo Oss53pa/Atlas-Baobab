@@ -44,6 +44,35 @@ export interface Child {
   profile_reviewed_at?: string;
   /** Partage avec un professionnel référent (§7) — jamais activé par défaut. */
   professional_sharing_enabled?: boolean;
+  /** Surclassements manuels du profil Mode Enfant v1.1 (§2.1) — le parent peut forcer
+   * n'importe quel axe (ex. un enfant de 9 ans sur les contenus 5-7). */
+  child_overrides?: ChildProfileOverride;
+}
+
+/** Progression par activité (CDC Mode Enfant v1.1 §6.1) : couche de logique posée
+ * AUTOUR des jeux existants. Clé du dictionnaire : `${childId}:${gameCode}`. */
+export interface GameProgress {
+  /** Niveau courant N1/N2/N3. */
+  level: 1 | 2 | 3;
+  /** Parties jouées. */
+  attempts: number;
+  /** Parties « réussies » (taux ≥ 80 %). */
+  wins: number;
+  /** Réussites consécutives ≥ 80 % (→ +1 niveau à 3). */
+  streak: number;
+  /** Échecs consécutifs < 60 % (→ -1 niveau à 2, silencieux). */
+  lossStreak: number;
+  /** Fruits gagnés (1 par partie complétée, §5.1). */
+  fruits: number;
+}
+
+/** Surclassements des 4 axes du profil enfant (CDC Mode Enfant v1.1 §2.1). */
+export interface ChildProfileOverride {
+  ageBand?: '2-4' | '5-7' | '8-12';
+  communication?: 'non-verbal' | 'emergent' | 'verbal';
+  sensory?: 'hyper' | 'typique' | 'hypo';
+  supportLevel?: 1 | 2 | 3;
+  motor?: 'fin-ok' | 'fin-difficile';
 }
 
 /** Observation locale = ObservationInput (Jumeau) + rattachements. */
@@ -260,6 +289,8 @@ export interface AppState {
   aacBoards: Record<string, AacBoard>;
   aacUsage: AacUsageEvent[];
   gameSessions: GameSession[];
+  /** Progression par activité (v1.1 §6.1), clé `${childId}:${gameCode}`. */
+  gameProgress: Record<string, GameProgress>;
   activityLogs: ActivityLog[];
   togetherLogs: TogetherLog[];
   coachActions: CoachAction[];
@@ -273,4 +304,7 @@ export interface AppState {
   forumPosts: ForumPost[];
   settings: AppSettings;
   seeded: boolean;
+  /** Transitoire : dernier passage de niveau (v1.1 §6.1), pour que Bibo l'annonce
+   * au retour sur la natte. Effacé après lecture. */
+  lastLevelUp?: { code: string; level: 1 | 2 | 3 } | null;
 }

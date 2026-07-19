@@ -362,7 +362,7 @@ function PhoneMock() {
           <div className="mini-gauge-val"><b>72</b><small>/100</small></div>
         </div>
         <div className="mini-card">
-          <img className="pm-bibo" src="/avatars/bibo.webp" alt="" />
+          <img className="pm-bibo bibo-alive" src="/avatars/bibo.webp" alt="" />
           <span><b>Bibo</b> a remarqué que les crises arrivent souvent en fin de journée.</span>
         </div>
         <div className="pm-chips">

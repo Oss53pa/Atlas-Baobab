@@ -3,6 +3,8 @@ import { Key } from 'lucide-react';
 import { actions, activeChild, useAppState } from '../../lib/store.js';
 import { avatarGlyph, ART } from '../../lib/avatars.js';
 import { childRegistre, registreCopy } from '../../lib/paliers.js';
+import { childConfig } from '../../lib/childProfileConfig.js';
+import { playChildSound, haptic, getSensoryMode, cycleSensoryMode, setProfileVolume, type SensoryMode } from '../../lib/childAudio.js';
 import { speak } from '../../lib/tts.js';
 import { Caa } from './Caa.js';
 import { CoinCalme } from './CoinCalme.js';
@@ -15,13 +17,13 @@ export function ChildShell({ onExit, start = 'home' }: { onExit: () => void; sta
   const state = useAppState();
   const child = activeChild(state);
   const [view, setView] = useState<ChildView>(start);
-  const [armed, setArmed] = useState<string | null>(null);
   const [intro, setIntro] = useState(start === 'home');
   const [closing, setClosing] = useState(false);
   const [exitHint, setExitHint] = useState(() => {
     try { return !localStorage.getItem('ab-exit-hint-seen'); } catch { return false; }
   });
-  const armTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // §2 : le volume par défaut suit le profil sensoriel de l'enfant.
+  useEffect(() => { if (child) setProfileVolume(childConfig(child).fx.volumeScale); }, [child?.id, child?.sensory_input?.auditory]);
   const wasOver = useRef<boolean | null>(null);
   const preSignaled = useRef(false);
 
@@ -106,6 +108,7 @@ export function ChildShell({ onExit, start = 'home' }: { onExit: () => void; sta
         {child.exit_pictogram ?? '🫧'}
       </button>
       <ParentButton onHold={onExit} theme={child.active_theme} />
+      <SensoryButton />
       {exitHint && (
         <button className="cs-exit-hint" onClick={dismissExitHint}>
           <Key size={15} style={{ flex: '0 0 auto', marginTop: 1 }} />
@@ -126,13 +129,12 @@ export function ChildShell({ onExit, start = 'home' }: { onExit: () => void; sta
   if (view === 'game') return wrap(<JouerHub onExit={() => setView('home')} onBulle={() => setView('calme')} />);
   if (view === 'arbre') return wrap(<MonArbre onExit={() => setView('home')} />);
 
-  // 1er tap : dit le nom + arme ; 2e tap sur la même zone : navigue.
-  function tapZone(key: string, label: string, action?: () => void) {
+  // L1 (CDC v1.1) : UN seul tap = son + voix + action, immédiatement. Fini le 2-tap.
+  function tapZone(label: string, action?: () => void) {
+    playChildSound('tap');
+    if (child && childConfig(child).fx.haptic) haptic();
     speak(label);
-    if (armed === key && action) { setArmed(null); action(); return; }
-    setArmed(key);
-    if (armTimer.current) clearTimeout(armTimer.current);
-    armTimer.current = setTimeout(() => setArmed(null), 2600);
+    action?.();
   }
   return wrap(
     <div className={`child-scene ${isStatic ? 'static' : ''}`} data-theme={child.active_theme}>
@@ -173,21 +175,25 @@ export function ChildShell({ onExit, start = 'home' }: { onExit: () => void; sta
         </g>
       </svg>
 
-      {/* Zones tactiles géantes */}
-      <button className="cs-zone" style={{ left: '3%', top: '17%', width: '35%', height: '50%' }} onClick={() => tapZone('arbre', 'Mon arbre', () => setView('arbre'))}>
-        <span className="cs-zlabel" style={{ bottom: '8%' }}><img className="cs-zi-img" src={ART.arbre} alt="" aria-hidden /><span>Mon arbre</span><span className="cs-zc">›</span></span>
+      {/* Bibo — mascotte VIVANTE, calque séparé posé sur la scène centrale (§3.3) */}
+      <button className="cs-home-bibo" onClick={() => { playChildSound('bibo'); if (childConfig(child).fx.haptic) haptic(); speak(`Bonjour ${child.first_name} !`); }} aria-label="Bibo">
+        <img className="bibo-alive" src="/avatars/bibo.webp" alt="" />
       </button>
-      <button className={`cs-zone ${overQuota ? 'muted' : ''}`} style={{ left: '62%', top: '42%', width: '35%', height: '34%' }}
-        onClick={() => overQuota ? speak(rc.quotaSpeak) : tapZone('jouer', 'Jouer', () => setView('game'))}>
-        <span className="cs-zlabel" style={{ bottom: '3%' }}><span className="cs-zi">🧩</span><span>{overQuota ? rc.quotaZone : 'Jouer'}</span>{!overQuota && <span className="cs-zc">›</span>}</span>
+
+      {/* Zones tactiles — calées sur ce décor : arbre au centre, mare à gauche, jouer à droite */}
+      <button className="cs-zone" style={{ left: '30%', top: '6%', width: '40%', height: '56%' }} onClick={() => tapZone('Mon arbre', () => setView('arbre'))}>
+        <span className="cs-zlabel" style={{ bottom: '4%' }}><img className="cs-zi-img" src={ART.arbre} alt="" aria-hidden /><span>Mon arbre</span><span className="cs-zc">›</span></span>
       </button>
-      <button className="cs-zone" style={{ left: '38%', top: '58%', width: '26%', height: '22%' }} onClick={() => tapZone('bulle', 'Ma bulle', () => setView('calme'))}>
-        <span className="cs-zlabel" style={{ bottom: '2%' }}><span className="cs-zi">🫧</span><span>Ma bulle</span><span className="cs-zc">›</span></span>
+      <button className="cs-zone" style={{ left: '1%', top: '55%', width: '32%', height: '28%' }} onClick={() => tapZone('Ma bulle', () => setView('calme'))}>
+        <span className="cs-zlabel" style={{ bottom: '6%' }}><span className="cs-zi">🫧</span><span>Ma bulle</span><span className="cs-zc">›</span></span>
       </button>
-      <button className="cs-zone" style={{ left: '42%', top: '33%', width: '16%', height: '22%' }} onClick={() => speak(`Bonjour ${child.first_name} !`)} aria-label="Bibo" />
+      <button className={`cs-zone ${overQuota ? 'muted' : ''}`} style={{ left: '66%', top: '50%', width: '32%', height: '30%' }}
+        onClick={() => overQuota ? speak(rc.quotaSpeak) : tapZone('Jouer', () => setView('game'))}>
+        <span className="cs-zlabel" style={{ bottom: '6%' }}><span className="cs-zi">🧩</span><span>{overQuota ? rc.quotaZone : 'Jouer'}</span>{!overQuota && <span className="cs-zc">›</span>}</span>
+      </button>
 
       {/* Je parle : barre permanente */}
-      <button className="cs-talk" onClick={() => { speak('Je parle'); setView('caa'); }}>
+      <button className="cs-talk" onClick={() => { playChildSound('tap'); speak('Je parle'); setView('caa'); }}>
         <span className="cs-talk-pic">💬</span><span className="cs-talk-name">Je parle</span>
       </button>
 
@@ -229,6 +235,23 @@ function ParentButton({ onHold, theme }: { onHold: () => void; theme: string }) 
         <circle className={`fill ${holding ? 'on' : ''}`} cx="22" cy="22" r="20" pathLength={100} />
       </svg>
       <Key size={19} />
+    </button>
+  );
+}
+
+/** Bouton sensoriel (CDC v1.1 L5) : 3 états cyclés au tap — sons+musique / sons
+ * seuls / silence. Persistant. Icône SVG maison (pas de lucide/emoji en zone enfant). */
+function SensoryButton() {
+  const [m, setM] = useState<SensoryMode>(getSensoryMode());
+  return (
+    <button className="cs-sensory" data-mode={m} onClick={() => { setM(cycleSensoryMode()); playChildSound('tap'); }}
+      aria-label={m === 'full' ? 'Sons et musique' : m === 'sounds' ? 'Sons seuls' : 'Silence'}>
+      <svg viewBox="0 0 24 24" width="27" height="27" aria-hidden>
+        <path d="M4 9h3l4-3v12l-4-3H4z" fill="currentColor" />
+        {m !== 'silence' && <path d="M14.5 9.5q2 2.5 0 5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />}
+        {m === 'full' && <path d="M17 7.5q3.4 4.5 0 9" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />}
+        {m === 'silence' && <path d="M15 9.5l5 5M20 9.5l-5 5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />}
+      </svg>
     </button>
   );
 }
